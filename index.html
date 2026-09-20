@@ -4,24 +4,50 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#060609">
-​<!-- PWA & Mobile Web App Meta -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NOVA Studio">
-<meta name="application-name" content="NOVA Studio">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.svg">
-​<title>NOVA Studio</title>
-​<!-- Standalone Offline Babel (Deferred for Compilation) -->
+<title>NOVA Studio</title>
+​<!-- Dynamic Optical Squircle Favicon & App Icon -->
+<script>
+(function() {
+try {
+var canvas = document.createElement('canvas');
+canvas.width = 128; canvas.height = 128;
+var ctx = canvas.getContext('2d');
+ctx.fillStyle = '#060609';
+ctx.beginPath();
+ctx.roundRect(0, 0, 128, 128, 28);
+ctx.fill();
+var g = ctx.createLinearGradient(20, 20, 108, 108);
+g.addColorStop(0, '#0A84FF');
+g.addColorStop(1, '#5E5CE6');
+ctx.fillStyle = g;
+ctx.beginPath();
+ctx.arc(64, 64, 34, 0, Math.PI * 2);
+ctx.fill();
+ctx.fillStyle = '#FFFFFF';
+ctx.beginPath();
+ctx.arc(64, 64, 14, 0, Math.PI * 2);
+ctx.fill();
+var url = canvas.toDataURL('image/png');
+var link = document.createElement('link');
+link.rel = 'icon'; link.type = 'image/png'; link.href = url;
+document.head.appendChild(link);
+var appleLink = document.createElement('link');
+appleLink.rel = 'apple-touch-icon'; appleLink.href = url;
+document.head.appendChild(appleLink);
+} catch (e) {}
+})();
+</script>
+​<!-- Babel Standalone (Deferred for React JSX compilation) -->
 <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 ​<style>
 :root {
 --bg-base: #060609;
---bg-panel: rgba(18, 18, 24, 0.82);
---bg-panel-border: rgba(255, 255, 255, 0.08);
---bg-panel-subtle: rgba(26, 26, 34, 0.6);
+--bg-panel: rgba(18, 18, 24, 0.85);
+--bg-panel-border: rgba(255, 255, 255, 0.09);
 --apple-blue: #0A84FF;
 --apple-blue-hover: #0071E3;
 --apple-red: #FF453A;
@@ -50,30 +76,15 @@ width: 100vw;
 overflow: hidden;
 overscroll-behavior: none;
 -webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
 user-select: none;
 }
-​/* Ambient Mesh Background */
-.ambient-mesh {
-position: fixed;
-inset: 0;
-z-index: 0;
-pointer-events: none;
-background:
-radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.09) 0%, transparent 45%),
-radial-gradient(circle at 90% 90%, rgba(94, 92, 230, 0.08) 0%, transparent 50%),
-var(--bg-base);
-}
-​/* Glass Panel */
-.glass-panel {
+​.glass-panel {
 background: var(--bg-panel);
 backdrop-filter: blur(30px) saturate(180%);
 -webkit-backdrop-filter: blur(30px) saturate(180%);
 border: 1px solid var(--bg-panel-border);
-box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.6);
 }
-​/* Interactive Buttons */
-.btn {
+​.btn {
 display: inline-flex;
 align-items: center;
 justify-content: center;
@@ -113,17 +124,34 @@ height: 34px;
 padding: 0;
 border-radius: 10px;
 }
-​/* Top Bar Layouts */
-.header-bar {
-height: 54px;
+​/* Views */
+#home-view {
 display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 0 16px;
-flex-shrink: 0;
-z-index: 30;
+flex-direction: column;
+height: 100%;
+width: 100%;
+position: absolute;
+inset: 0;
+z-index: 10;
+padding: max(12px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)) 16px;
 }
-​/* Segmented Mode Switcher */
+​#ide-view {
+display: none;
+width: 100%;
+height: 100%;
+flex-direction: column;
+position: absolute;
+inset: 0;
+z-index: 20;
+}
+@media (min-width: 768px) {
+#ide-view {
+padding: 12px;
+flex-direction: row;
+gap: 12px;
+}
+}
+​/* Segmented Mode Capsule */
 .segmented-wrap {
 display: inline-flex;
 align-items: center;
@@ -158,11 +186,11 @@ left: 3px;
 background: rgba(255, 255, 255, 0.15);
 border: 1px solid rgba(255, 255, 255, 0.18);
 border-radius: 9999px;
-transition: transform 0.26s var(--ease-ios), width 0.26s var(--ease-ios);
+transition: transform 0.25s var(--ease-ios), width 0.25s var(--ease-ios);
 pointer-events: none;
 z-index: 1;
 }
-​/* Workspace Grid on Home Dashboard */
+​/* Workspace Grid */
 .workspace-grid {
 display: grid;
 grid-template-columns: 1fr;
@@ -194,24 +222,7 @@ border-color: rgba(255, 255, 255, 0.2);
 transform: translateY(-2px);
 background: rgba(26, 26, 34, 0.85);
 }
-​/* IDE Layout */
-#ide-view {
-display: none;
-width: 100%;
-height: 100%;
-flex-direction: column;
-position: absolute;
-inset: 0;
-z-index: 20;
-}
-@media (min-width: 768px) {
-#ide-view {
-padding: 12px;
-flex-direction: row;
-gap: 12px;
-}
-}
-​/* Sidebar File Tree */
+​/* Sidebar */
 #sidebar {
 position: absolute;
 top: 0;
@@ -233,7 +244,7 @@ position: relative;
 transform: translateX(0) !important;
 border-radius: 18px;
 border: 1px solid rgba(255, 255, 255, 0.08);
-width: 240px;
+width: 230px;
 max-width: none;
 flex-shrink: 0;
 }
@@ -250,7 +261,7 @@ backdrop-filter: blur(8px);
 -webkit-backdrop-filter: blur(8px);
 z-index: 45;
 }
-​/* Editor Section */
+​/* Editor Surface */
 .editor-container {
 position: relative;
 width: 100%;
@@ -302,7 +313,7 @@ user-select: text;
 #code-editor::selection {
 background: rgba(10, 132, 255, 0.35);
 }
-​/* Mobile Symbol Quick Bar */
+​/* Mobile Symbol Row */
 .mobile-quick-bar {
 height: 42px;
 background: #0C0C11;
@@ -333,7 +344,7 @@ cursor: pointer;
 .quick-symbol-btn:active {
 background: var(--apple-blue);
 }
-​/* Splitter Handle */
+​/* Desktop Resizer */
 #resizer {
 width: 12px;
 margin: 0 -6px;
@@ -381,7 +392,7 @@ border-radius: 20px;
 overflow: hidden;
 box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
 }
-​/* Bottom Tab Bar (Mobile) */
+​/* Mobile Bottom Tab Bar */
 .mobile-bottom-nav {
 height: 48px;
 background: #0C0C11;
@@ -440,23 +451,22 @@ transform: translateX(-50%) translateY(0);
 </style>
 </head>
 <body>
-​<div class="ambient-mesh"></div>
-​<!-- Hidden Native Print Frame -->
+​<!-- Hidden Native Print Bridge Frame -->
 <iframe id="native-print-frame" style="position:fixed;right:0;bottom:0;width:0;height:0;border:none;visibility:hidden;"></iframe>
 ​<!-- ============================================================= -->
-<!-- HOME VIEW (WORKSPACE DASHBOARD)                              -->
+<!-- 1. HOME VIEW (WORKSPACE DASHBOARD)                            -->
 <!-- ============================================================= -->
-<div id="home-view" style="display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; z-index: 10; padding: max(12px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)) 16px;">
-​<header class="glass-panel" style="max-width: 900px; width: 100%; margin: 0 auto 18px auto; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px;">
+<div id="home-view">
+<header class="glass-panel" style="max-width: 900px; width: 100%; margin: 0 auto 18px auto; height: 56px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px;">
 <div style="display: flex; align-items: center; gap: 10px;">
 <div style="width: 32px; height: 32px; border-radius: 9px; background: rgba(10, 132, 255, 0.18); border: 1px solid rgba(10, 132, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--apple-blue);">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
 </div>
 <span style="font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: #FFFFFF;">NOVA Studio</span>
 </div>
 ​<div style="display: flex; align-items: center; gap: 8px;">
 <button onclick="UI.showNewProjectModal()" class="btn btn-primary">
-<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
 <span>New Workspace</span>
 </button>
 </div>
@@ -467,26 +477,25 @@ transform: translateX(-50%) translateY(0);
 </div>
 </div>
 ​<!-- ============================================================= -->
-<!-- IDE WORKSPACE VIEW                                            -->
+<!-- 2. IDE WORKSPACE VIEW                                         -->
 <!-- ============================================================= -->
 <div id="ide-view">
-​<!-- Mobile Top Header -->
-<header class="header-bar glass-panel" style="border-radius: 0; border-left: none; border-right: none; border-top: none; display: flex;" id="mobile-header">
+​<!-- Mobile Header -->
+<header class="glass-panel" style="height: 52px; border-radius: 0; border-left: none; border-right: none; border-top: none; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; z-index: 30;" id="mobile-header">
 <div style="display: flex; align-items: center; gap: 4px; min-width: 0;">
 <button onclick="UI.switchView('home')" class="btn btn-icon" title="Workspaces">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
 </button>
 <button onclick="UI.toggleSidebar()" class="btn btn-icon" title="Files">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
 </button>
 <span id="mobile-proj-name" style="font-size: 13px; font-weight: 600; color: #FFFFFF; margin-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;">Workspace</span>
 </div>
 ​<div style="display: flex; align-items: center; gap: 6px;">
 <button onclick="PrintEngine.print()" class="btn btn-icon" title="Print / PDF">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--apple-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--apple-blue)" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
 </button>
 <button onclick="UI.openExportModal()" class="btn" style="padding: 6px 10px; font-size: 12px; color: var(--apple-blue); background: rgba(10,132,255,0.12); border-color: rgba(10,132,255,0.25);">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
 <span>Export</span>
 </button>
 <button onclick="Engine.run(); UI.setMobileTab('preview');" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
@@ -528,8 +537,8 @@ transform: translateX(-50%) translateY(0);
 <div id="sidebar-overlay" onclick="UI.toggleSidebar()"></div>
 ​<!-- Main Workspace Pane -->
 <main class="glass-panel" style="flex: 1; display: flex; flex-direction: column; border-radius: 0; overflow: hidden; position: relative; min-width: 0; min-height: 0;" id="workspace-main">
-​<!-- Desktop Top Header -->
-<header class="header-bar" style="border-bottom: 1px solid rgba(255,255,255,0.06); display: none;" id="desktop-header">
+​<!-- Desktop Header -->
+<header class="glass-panel" style="height: 52px; border-radius: 0; border-left: none; border-right: none; border-top: none; display: none; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; z-index: 30;" id="desktop-header">
 <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
 <button onclick="UI.toggleDesktopSidebar()" class="btn btn-icon" title="Toggle Files">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
@@ -558,9 +567,8 @@ transform: translateX(-50%) translateY(0);
 </div>
 </header>
 ​<div id="workspace-splitter-container" style="flex: 1; display: flex; width: 100%; min-height: 0; min-width: 0; position: relative;">
-​<!-- Code Editor Column -->
+​<!-- Code Column -->
 <section id="editor-col" style="display: flex; flex-direction: column; flex: 1; width: 100%; height: 100%; min-height: 0; min-width: 0; background: #08080C; position: relative;">
-​<!-- Editor File Tabs -->
 <div style="height: 38px; background: rgba(0,0,0,0.35); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 4px; flex-shrink: 0;">
 <div id="open-file-tabs" style="display: flex; align-items: center; gap: 4px; flex: 1; overflow-x: auto; height: 100%; min-width: 0;"></div>
 <div style="display: flex; align-items: center; gap: 2px; padding-left: 6px; border-left: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;">
@@ -572,12 +580,12 @@ transform: translateX(-50%) translateY(0);
 </button>
 </div>
 </div>
-​<!-- Code Surface -->
+​<!-- Code Editor Surface -->
 <div class="editor-container" id="editor-surface">
 <div id="line-numbers">1</div>
 <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
 </div>
-​<!-- Mobile Symbol Bar -->
+​<!-- Mobile Quick Symbol Bar -->
 <div class="mobile-quick-bar" id="mobile-symbols">
 <button onclick="document.execCommand('undo')" class="quick-symbol-btn" title="Undo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg></button>
 <button onclick="document.execCommand('redo')" class="quick-symbol-btn" title="Redo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg></button>
@@ -596,11 +604,10 @@ transform: translateX(-50%) translateY(0);
 <button onclick="UI.insertCode('  ')" class="quick-symbol-btn">Tab</button>
 </div>
 </section>
-​<!-- Desktop Resizer -->
+​<!-- Desktop Resizer Handle -->
 <div id="resizer"><div class="resizer-bar"></div></div>
 ​<!-- Preview Column -->
 <section id="preview-col" style="display: flex; flex-direction: column; flex: 1; width: 100%; height: 100%; min-height: 0; min-width: 0; background: #0A0A0E; border-left: 1px solid rgba(255,255,255,0.06); position: relative;">
-​<!-- Preview Bar -->
 <div style="height: 38px; background: rgba(0,0,0,0.35); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; flex-shrink: 0;">
 <div style="display: flex; align-items: center; gap: 4px;">
 <button onclick="Preview.setMode('mobile')" id="vp-mobile" class="btn btn-icon" style="width: 28px; height: 28px;" title="Mobile Screen">
@@ -622,7 +629,7 @@ transform: translateX(-50%) translateY(0);
 </button>
 </div>
 </div>
-​<!-- Sandbox Iframe Surface -->
+​<!-- Preview Iframe -->
 <div id="iframe-viewport-wrap" style="flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #040407; min-height: 0; min-width: 0;">
 <iframe id="preview-frame" sandbox="allow-scripts allow-modals allow-same-origin allow-popups" style="width: 100%; height: 100%; border: none; background: #08080C;"></iframe>
 </div>
@@ -643,7 +650,7 @@ transform: translateX(-50%) translateY(0);
 </div>
 </section>
 </div>
-​<!-- Mobile Bottom Tabs -->
+​<!-- Mobile Bottom Navigation -->
 <nav class="mobile-bottom-nav">
 <button onclick="UI.setMobileTab('editor')" id="nav-btn-editor" class="mob-nav-btn active">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
@@ -662,7 +669,7 @@ transform: translateX(-50%) translateY(0);
 </main>
 </div>
 ​<!-- ============================================================= -->
-<!-- NEW WORKSPACE MODAL                                           -->
+<!-- 3. MODALS (NEW WORKSPACE & EXPORT)                            -->
 <!-- ============================================================= -->
 <div id="new-proj-overlay" class="modal-overlay">
 <div class="modal-box" onclick="event.stopPropagation()">
@@ -675,7 +682,7 @@ transform: translateX(-50%) translateY(0);
 ​<div style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
 <div>
 <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Workspace Name</label>
-<input type="text" id="new-workspace-name" placeholder="My App" autocomplete="off" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 14px; font-size: 14px; color: #FFFFFF; outline: none;">
+<input type="text" id="new-workspace-name" placeholder="My Workspace" autocomplete="off" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 14px; font-size: 14px; color: #FFFFFF; outline: none;">
 </div>
 <div>
 <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Template</label>
@@ -693,10 +700,7 @@ transform: translateX(-50%) translateY(0);
 </div>
 </div>
 </div>
-​<!-- ============================================================= -->
-<!-- EXPORT & COMPILE MODAL                                        -->
-<!-- ============================================================= -->
-<div id="export-overlay" class="modal-overlay">
+​<div id="export-overlay" class="modal-overlay">
 <div class="modal-box" onclick="event.stopPropagation()">
 <div style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
 <h3 style="font-size: 14px; font-weight: 600; color: #FFFFFF;">Export Workspace</h3>
@@ -735,7 +739,7 @@ transform: translateX(-50%) translateY(0);
 </div>
 </div>
 </div>
-​<!-- Generic Dialog (Prompt / Alert / Confirm) -->
+​<!-- Prompt / Alert Dialog -->
 <div id="dialog-overlay" class="modal-overlay">
 <div class="modal-box" onclick="event.stopPropagation()">
 <div style="padding: 20px 18px 16px 18px; text-align: center;">
@@ -749,17 +753,20 @@ transform: translateX(-50%) translateY(0);
 </div>
 </div>
 </div>
-​<!-- Notification Toast -->
+​<!-- Toast Platter -->
 <div id="toast">
 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--apple-blue)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-<span id="toast-text">Success</span>
+<span id="toast-text">Ready</span>
 </div>
 ​<!-- ============================================================= -->
-<!-- APPLICATION CORE LOGIC                                        -->
+<!-- 4. APPLICATION CORE ENGINE                                    -->
 <!-- ============================================================= -->
 <script>
-// --- Built-in Templates ---
-const Templates = {
+// Safe script tag generators to prevent any browser tokenizer crashes
+var S_START = '<' + 'script';
+var S_END = '<' + '/script>';
+​// Built-in Templates
+var Templates = {
 empty: [
 { id: '1', name: 'index.html', language: 'html', content: '' }
 ],
@@ -768,171 +775,52 @@ react: [
 id: '1',
 name: 'App.jsx',
 language: 'javascript',
-content: `import React, { useState } from 'react';
-​export default function App() {
-const [count, setCount] = useState(0);
-​return (
-<div style={{ minHeight: '100vh', background: '#08080C', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif' }}>
-<div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '32px', textAlign: 'center', maxWidth: '320px', width: '100%' }}>
-<h1 style={{ fontSize: '18px', margin: 0, fontWeight: 700 }}>React 18 Playground</h1>
-<p style={{ fontSize: '12px', color: '#8E8E93', marginTop: '6px' }}>NOVA Studio Live Compiler</p>
-​<div style={{ fontSize: '48px', fontWeight: 'bold', margin: '24px 0', color: '#0A84FF', fontFamily: 'monospace' }}>
-{count}
-</div>
-​<div style={{ display: 'flex', gap: '8px' }}>
-<button
-onClick={() => setCount(c => c - 1)}
-style={{ flex: 1, padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', color: '#FFF', border: 'none', cursor: 'pointer', fontWeight: 600 }}
->
--
-</button>
-<button
-onClick={() => setCount(c => c + 1)}
-style={{ flex: 1, padding: '10px', borderRadius: '12px', background: '#0A84FF', color: '#FFF', border: 'none', cursor: 'pointer', fontWeight: 700 }}
->
-+
-</button>
-</div>
-</div>
-</div>
-);
-}}, { id: '2', name: 'style.css', language: 'css', content:body { margin: 0; background: #08080C; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }} ], vanilla: [ { id: '1', name: 'index.html', language: 'html', content:<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vanilla Web App</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="card">
-<h1>Hello World</h1>
-<p>Minimal & Fast Live Workspace</p>
-<button onclick="changeText()">Click Me</button>
-<div id="output"></div>
-</div>
-<script src="script.js"></script>
-</body>
-</html>}, { id: '2', name: 'style.css', language: 'css', content:body {
-margin: 0;
-background: #08080C;
-color: #FFFFFF;
-display: flex;
-justify-content: center;
-align-items: center;
-height: 100vh;
-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+content: 'import React, { useState } from "react";\n\nexport default function App() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div style={{ minHeight: "100vh", background: "#08080C", color: "#FFF", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "system-ui, sans-serif" }}>\n      <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "32px", textAlign: "center", maxWidth: "320px", width: "100%" }}>\n        <h1 style={{ fontSize: "18px", margin: 0, fontWeight: 700 }}>React 18 Playground</h1>\n        <p style={{ fontSize: "12px", color: "#8E8E93", marginTop: "6px" }}>NOVA Studio Live Compiler</p>\n        \n        <div style={{ fontSize: "48px", fontWeight: "bold", margin: "24px 0", color: "#0A84FF", fontFamily: "monospace" }}>\n          {count}\n        </div>\n\n        <div style={{ display: "flex", gap: "8px" }}>\n          <button \n            onClick={() => setCount(c => c - 1)}\n            style={{ flex: 1, padding: "10px", borderRadius: "12px", background: "rgba(255,255,255,0.1)", color: "#FFF", border: "none", cursor: "pointer", fontWeight: 600 }}\n          >\n            -\n          </button>\n          <button \n            onClick={() => setCount(c => c + 1)}\n            style={{ flex: 1, padding: "10px", borderRadius: "12px", background: "#0A84FF", color: "#FFF", border: "none", cursor: "pointer", fontWeight: 700 }}\n          >\n            +\n          </button>\n        </div>\n      </div>\n    </div>\n  );\n}'
+},
+{
+id: '2',
+name: 'style.css',
+language: 'css',
+content: 'body { margin: 0; background: #08080C; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }'
 }
-.card {
-padding: 32px;
-background: rgba(255, 255, 255, 0.05);
-border: 1px solid rgba(255, 255, 255, 0.1);
-border-radius: 20px;
-text-align: center;
-max-width: 300px;
+],
+vanilla: [
+{
+id: '1',
+name: 'index.html',
+language: 'html',
+content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Vanilla Web App</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div class="card">\n    <h1>Hello World</h1>\n    <p>Minimal & Fast Live Workspace</p>\n    <button onclick="changeText()">Click Me</button>\n    <div id="output"></div>\n  </div>\n  ' + S_START + ' src="script.js">' + S_END + '\n</body>\n</html>'
+},
+{
+id: '2',
+name: 'style.css',
+language: 'css',
+content: 'body {\n  margin: 0;\n  background: #08080C;\n  color: #FFFFFF;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;\n}\n.card {\n  padding: 32px;\n  background: rgba(255, 255, 255, 0.05);\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  border-radius: 20px;\n  text-align: center;\n  max-width: 300px;\n}\nh1 { margin: 0 0 6px 0; font-size: 20px; }\np { margin: 0 0 20px 0; font-size: 13px; color: #8E8E93; }\nbutton {\n  background: #0A84FF;\n  color: #FFFFFF;\n  border: none;\n  padding: 8px 18px;\n  border-radius: 99px;\n  font-size: 13px;\n  font-weight: 600;\n  cursor: pointer;\n}\n#output { margin-top: 14px; font-size: 13px; color: #32D74B; }'
+},
+{
+id: '3',
+name: 'script.js',
+language: 'javascript',
+content: 'function changeText() {\n  document.getElementById("output").innerText = "Ready to build!";\n  console.log("Action triggered successfully.");\n}'
 }
-h1 { margin: 0 0 6px 0; font-size: 20px; }
-p { margin: 0 0 20px 0; font-size: 13px; color: #8E8E93; }
-button {
-background: #0A84FF;
-color: #FFFFFF;
-border: none;
-padding: 8px 18px;
-border-radius: 99px;
-font-size: 13px;
-font-weight: 600;
-cursor: pointer;
-}
-#output { margin-top: 14px; font-size: 13px; color: #32D74B; }}, { id: '3', name: 'script.js', language: 'javascript', content:function changeText() {
-document.getElementById('output').innerText = 'Ready to build!';
-console.log('Action triggered successfully.');
-}} ], printpdf: [ { id: '1', name: 'index.html', language: 'html', content:<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Invoice / Document</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="print-page">
-<div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid #E5E5EA;">
-<span style="font-size:12px; font-weight:700; color:#8E8E93; text-transform:uppercase;">Print Preview</span>
-<button onclick="window.print()" style="background:#0A84FF; color:#FFF; border:none; border-radius:10px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer;">
-Print / Save PDF
-</button>
-</div>
-​<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px;">
-<div>
-<h1 style="margin:0; font-size:24px; font-weight:900; letter-spacing:-0.5px; color:#1C1C1E;">INVOICE</h1>
-<p style="margin:4px 0 0 0; font-family:monospace; font-size:12px; color:#636366;">#INV-2026-0042</p>
-</div>
-<div style="text-align:right;">
-<p style="margin:0; font-size:13px; font-weight:600; color:#1C1C1E;">NOVA Studio</p>
-<p style="margin:2px 0 0 0; font-size:12px; color:#8E8E93;">Sept 20, 2026</p>
-</div>
-</div>
-​<div style="background:#F2F2F7; border-radius:12px; padding:14px; margin-bottom:24px;">
-<p style="margin:0; font-size:13px; color:#3A3A3C;">This document is formatted for clean screen viewing and paper printouts via AirPrint and Android Print.</p>
-</div>
-​<table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:24px;">
-<thead>
-<tr style="border-bottom:2px solid #E5E5EA; text-align:left;">
-<th style="padding:8px 0; color:#636366;">Description</th>
-<th style="padding:8px 0; text-align:right; color:#636366;">Amount</th>
-</tr>
-</thead>
-<tbody>
-<tr style="border-bottom:1px solid #F2F2F7;">
-<td style="padding:10px 0;">Developer License</td>
-<td style="padding:10px 0; text-align:right; font-family:monospace;">$0.00</td>
-</tr>
-</tbody>
-</table>
-</div>
-</body>
-</html>}, { id: '2', name: 'style.css', language: 'css', content:body {
-margin: 0;
-padding: 24px;
-background: #0B0C10;
-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-display: flex;
-justify-content: center;
-}
-.print-page {
-background: #FFFFFF;
-color: #1C1C1E;
-width: 100%;
-max-width: 650px;
-border-radius: 16px;
-padding: 32px;
-box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-@media print {
-body {
-background: #FFFFFF !important;
-padding: 0 !important;
-margin: 0 !important;
-}
-.no-print {
-display: none !important;
-}
-.print-page {
-box-shadow: none !important;
-border: none !important;
-max-width: 100% !important;
-border-radius: 0 !important;
-padding: 0 !important;
-}
-@page {
-margin: 1.5cm;
-}
-}`
+],
+printpdf: [
+{
+id: '1',
+name: 'index.html',
+language: 'html',
+content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Invoice / Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div class="print-page">\n    <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid #E5E5EA;">\n      <span style="font-size:12px; font-weight:700; color:#8E8E93; text-transform:uppercase;">Print Preview</span>\n      <button onclick="window.print()" style="background:#0A84FF; color:#FFF; border:none; border-radius:10px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer;">\n        Print / Save PDF\n      </button>\n    </div>\n\n    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px;">\n      <div>\n        <h1 style="margin:0; font-size:24px; font-weight:900; letter-spacing:-0.5px; color:#1C1C1E;">INVOICE</h1>\n        <p style="margin:4px 0 0 0; font-family:monospace; font-size:12px; color:#636366;">#INV-2026-0042</p>\n      </div>\n      <div style="text-align:right;">\n        <p style="margin:0; font-size:13px; font-weight:600; color:#1C1C1E;">NOVA Studio</p>\n        <p style="margin:2px 0 0 0; font-size:12px; color:#8E8E93;">Sept 20, 2026</p>\n      </div>\n    </div>\n\n    <div style="background:#F2F2F7; border-radius:12px; padding:14px; margin-bottom:24px;">\n      <p style="margin:0; font-size:13px; color:#3A3A3C;">This document is formatted for clean screen viewing and paper printouts via AirPrint and Android Print.</p>\n    </div>\n\n    <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:24px;">\n      <thead>\n        <tr style="border-bottom:2px solid #E5E5EA; text-align:left;">\n          <th style="padding:8px 0; color:#636366;">Description</th>\n          <th style="padding:8px 0; text-align:right; color:#636366;">Amount</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr style="border-bottom:1px solid #F2F2F7;">\n          <td style="padding:10px 0;">Developer License</td>\n          <td style="padding:10px 0; text-align:right; font-family:monospace;">$0.00</td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n</body>\n</html>'
+},
+{
+id: '2',
+name: 'style.css',
+language: 'css',
+content: 'body {\n  margin: 0;\n  padding: 24px;\n  background: #0B0C10;\n  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;\n  display: flex;\n  justify-content: center;\n}\n.print-page {\n  background: #FFFFFF;\n  color: #1C1C1E;\n  width: 100%;\n  max-width: 650px;\n  border-radius: 16px;\n  padding: 32px;\n  box-shadow: 0 10px 30px rgba(0,0,0,0.5);\n}\n@media print {\n  body {\n    background: #FFFFFF !important;\n    padding: 0 !important;\n    margin: 0 !important;\n  }\n  .no-print {\n    display: none !important;\n  }\n  .print-page {\n    box-shadow: none !important;\n    border: none !important;\n    max-width: 100% !important;\n    border-radius: 0 !important;\n    padding: 0 !important;\n  }\n  @page {\n    margin: 1.5cm;\n  }\n}'
 }
 ]
 };
-​// --- Global Application State ---
-const State = {
+​// Global State
+var State = {
 projects: {},
 currentProjId: null,
 files: [],
@@ -942,8 +830,8 @@ mobileTab: 'editor',
 viewport: 'desktop',
 autoRunTimer: null
 };
-​// --- DOM Elements ---
-const Els = {
+​// DOM Elements
+var Els = {
 homeView: document.getElementById('home-view'),
 ideView: document.getElementById('ide-view'),
 cardsContainer: document.getElementById('workspace-cards-container'),
@@ -958,17 +846,20 @@ sidebarOverlay: document.getElementById('sidebar-overlay'),
 segmentIndicator: document.getElementById('segment-indicator'),
 editorCol: document.getElementById('editor-col'),
 previewCol: document.getElementById('preview-col'),
-resizer: document.getElementById('resizer')
+resizer: document.getElementById('resizer'),
+desktopHeader: document.getElementById('desktop-header')
 };
-​// --- Dialog System (Prompt, Alert, Confirm) ---
-const Dialog = {
-show: (type, title, message, defaultValue = '') => new Promise((resolve) => {
-const overlay = document.getElementById('dialog-overlay');
+​// Modal Dialog System
+var Dialog = {
+show: function(type, title, message, defaultValue) {
+if (defaultValue === undefined) defaultValue = '';
+return new Promise(function(resolve) {
+var overlay = document.getElementById('dialog-overlay');
 document.getElementById('dialog-title').innerText = title;
 document.getElementById('dialog-message').innerText = message;
-const input = document.getElementById('dialog-input');
-const cancelBtn = document.getElementById('dialog-btn-cancel');
-const confirmBtn = document.getElementById('dialog-btn-confirm');
+var input = document.getElementById('dialog-input');
+var cancelBtn = document.getElementById('dialog-btn-cancel');
+var confirmBtn = document.getElementById('dialog-btn-confirm');
 ​if (type === 'prompt') {
 input.style.display = 'block';
 input.value = defaultValue;
@@ -976,30 +867,31 @@ input.value = defaultValue;
 input.style.display = 'none';
 }
 ​cancelBtn.style.display = (type === 'alert') ? 'none' : 'block';
-​const close = (val) => {
+​function close(val) {
 overlay.style.display = 'none';
 resolve(val);
-};
-​confirmBtn.onclick = () => close(type === 'prompt' ? input.value : true);
-cancelBtn.onclick = () => close(type === 'prompt' ? null : false);
-input.onkeydown = (e) => {
+}
+​confirmBtn.onclick = function() { close(type === 'prompt' ? input.value : true); };
+cancelBtn.onclick = function() { close(type === 'prompt' ? null : false); };
+input.onkeydown = function(e) {
 if (e.key === 'Enter') confirmBtn.click();
 if (e.key === 'Escape') cancelBtn.click();
 };
 ​overlay.style.display = 'flex';
 if (type === 'prompt') input.focus();
-}),
-alert: (title, msg) => Dialog.show('alert', title, msg),
-confirm: (title, msg) => Dialog.show('confirm', title, msg),
-prompt: (title, msg, def) => Dialog.show('prompt', title, msg, def)
+});
+},
+alert: function(title, msg) { return Dialog.show('alert', title, msg); },
+confirm: function(title, msg) { return Dialog.show('confirm', title, msg); },
+prompt: function(title, msg, def) { return Dialog.show('prompt', title, msg, def); }
 };
-​// --- Native Print Engine ---
-const PrintEngine = {
-print: () => {
+​// Native AirPrint & Android System Print Engine
+var PrintEngine = {
+print: function() {
 UI.showToast("Opening Print Dialog...");
 try {
-const htmlContent = Workspace.compileDocument();
-let printFrame = document.getElementById('native-print-frame');
+var htmlContent = Workspace.compileDocument();
+var printFrame = document.getElementById('native-print-frame');
 if (!printFrame) {
 printFrame = document.createElement('iframe');
 printFrame.id = 'native-print-frame';
@@ -1012,31 +904,31 @@ printFrame.style.border = 'none';
 printFrame.style.visibility = 'hidden';
 document.body.appendChild(printFrame);
 }
-​const doc = printFrame.contentDocument || printFrame.contentWindow.document;
+​var doc = printFrame.contentDocument || printFrame.contentWindow.document;
 doc.open();
 doc.write(htmlContent);
 doc.close();
-​setTimeout(() => {
+​setTimeout(function() {
 try {
 printFrame.contentWindow.focus();
 printFrame.contentWindow.print();
 } catch (err) {
 PrintEngine.fallback(htmlContent);
 }
-}, 300);
+}, 350);
 } catch (e) {
 PrintEngine.fallback(Workspace.compileDocument());
 }
 },
-fallback: (docHtml) => {
+fallback: function(docHtml) {
 try {
-const win = window.open('', '_blank');
+var win = window.open('', '_blank');
 if (win) {
 win.document.open();
 win.document.write(docHtml);
 win.document.close();
 win.focus();
-setTimeout(() => win.print(), 350);
+setTimeout(function() { win.print(); }, 400);
 } else {
 UI.showToast("Allow popups to print");
 }
@@ -1045,33 +937,40 @@ UI.showToast("Print error occurred");
 }
 }
 };
-​// --- UI Controller ---
-const UI = {
-init: () => {
+​// UI Controller
+var UI = {
+init: function() {
 UI.setupEditorEvents();
 UI.setupSplitterEvents();
 UI.setupKeyboardShortcuts();
 ​if (window.innerWidth < 768) {
 UI.setMobileTab('editor');
+Els.desktopHeader.style.display = 'none';
 } else {
 UI.setViewMode('split');
+Els.desktopHeader.style.display = 'flex';
 }
-​window.addEventListener('resize', () => {
+​window.addEventListener('resize', function() {
 UI.updatePillPosition();
-if (window.innerWidth >= 768 && State.currentView === 'ide') {
+if (window.innerWidth >= 768) {
+Els.desktopHeader.style.display = 'flex';
+if (State.currentView === 'ide') {
 Els.editorCol.style.display = 'flex';
 Els.previewCol.style.display = 'flex';
 }
+} else {
+Els.desktopHeader.style.display = 'none';
+}
 });
 },
-​updatePillPosition: () => {
-const activeBtn = document.querySelector('.segmented-btn.active');
+​updatePillPosition: function() {
+var activeBtn = document.querySelector('.segmented-btn.active');
 if (Els.segmentIndicator && activeBtn) {
-Els.segmentIndicator.style.width = ${activeBtn.offsetWidth}px;
-Els.segmentIndicator.style.transform = translateX(${activeBtn.offsetLeft - 3}px);
+Els.segmentIndicator.style.width = activeBtn.offsetWidth + 'px';
+Els.segmentIndicator.style.transform = 'translateX(' + (activeBtn.offsetLeft - 3) + 'px)';
 }
 },
-​switchView: (view) => {
+​switchView: function(view) {
 State.currentView = view;
 if (view === 'home') {
 Workspace.saveImmediate();
@@ -1089,12 +988,12 @@ UI.setViewMode('split');
 }
 }
 },
-​setViewMode: (mode) => {
-['editor', 'split', 'preview'].forEach(m => {
-const btn = document.getElementById(tab-btn-${m});
+​setViewMode: function(mode) {
+['editor', 'split', 'preview'].forEach(function(m) {
+var btn = document.getElementById('tab-btn-' + m);
 if (btn) btn.classList.remove('active');
 });
-const activeBtn = document.getElementById(tab-btn-${mode});
+var activeBtn = document.getElementById('tab-btn-' + mode);
 if (activeBtn) activeBtn.classList.add('active');
 UI.updatePillPosition();
 ​if (mode === 'editor') {
@@ -1116,16 +1015,16 @@ Els.previewCol.style.width = '50%';
 Els.resizer.style.display = 'flex';
 }
 },
-​setMobileTab: (tab) => {
+​setMobileTab: function(tab) {
 State.mobileTab = tab;
-const es = Els.editorCol;
-const ps = Els.previewCol;
-const cw = document.getElementById('console-well');
-​['editor', 'preview', 'console'].forEach(t => {
-const btn = document.getElementById(nav-btn-${t});
+var es = Els.editorCol;
+var ps = Els.previewCol;
+var cw = document.getElementById('console-well');
+​['editor', 'preview', 'console'].forEach(function(t) {
+var btn = document.getElementById('nav-btn-' + t);
 if (btn) btn.classList.remove('active');
 });
-const activeBtn = document.getElementById(nav-btn-${tab});
+var activeBtn = document.getElementById('nav-btn-' + tab);
 if (activeBtn) activeBtn.classList.add('active');
 ​if (tab === 'editor') {
 es.style.display = 'flex';
@@ -1142,8 +1041,8 @@ cw.style.display = 'flex';
 cw.style.height = '100%';
 }
 },
-​toggleSidebar: () => {
-const isOpen = Els.sidebar.classList.contains('open');
+​toggleSidebar: function() {
+var isOpen = Els.sidebar.classList.contains('open');
 if (isOpen) {
 Els.sidebar.classList.remove('open');
 Els.sidebarOverlay.style.display = 'none';
@@ -1152,42 +1051,42 @@ Els.sidebar.classList.add('open');
 Els.sidebarOverlay.style.display = 'block';
 }
 },
-​toggleDesktopSidebar: () => {
+​toggleDesktopSidebar: function() {
 Els.sidebar.style.display = (Els.sidebar.style.display === 'none') ? 'flex' : 'none';
 },
-​showNewProjectModal: () => {
+​showNewProjectModal: function() {
 document.getElementById('new-workspace-name').value = '';
 document.getElementById('new-workspace-template').value = 'empty';
 document.getElementById('new-proj-overlay').style.display = 'flex';
 document.getElementById('new-workspace-name').focus();
 },
-​hideNewProjectModal: () => {
+​hideNewProjectModal: function() {
 document.getElementById('new-proj-overlay').style.display = 'none';
 },
-​openExportModal: () => {
+​openExportModal: function() {
 document.getElementById('export-overlay').style.display = 'flex';
 },
-​closeExportModal: () => {
+​closeExportModal: function() {
 document.getElementById('export-overlay').style.display = 'none';
 },
-​showToast: (msg) => {
-const toast = document.getElementById('toast');
+​showToast: function(msg) {
+var toast = document.getElementById('toast');
 document.getElementById('toast-text').innerText = msg;
 toast.classList.add('show');
-setTimeout(() => toast.classList.remove('show'), 2200);
+setTimeout(function() { toast.classList.remove('show'); }, 2200);
 },
-​insertCode: (char) => {
-const ed = Els.editor;
-const start = ed.selectionStart;
-const end = ed.selectionEnd;
+​insertCode: function(char) {
+var ed = Els.editor;
+var start = ed.selectionStart;
+var end = ed.selectionEnd;
 ed.value = ed.value.substring(0, start) + char + ed.value.substring(end);
 ed.selectionStart = ed.selectionEnd = start + char.length;
 ed.dispatchEvent(new Event('input'));
 ed.focus();
 },
-​setupEditorEvents: () => {
-Els.editor.addEventListener('input', (e) => {
-const f = State.files.find(x => x.id === State.activeFileId);
+​setupEditorEvents: function() {
+Els.editor.addEventListener('input', function(e) {
+var f = State.files.find(function(x) { return x.id === State.activeFileId; });
 if (f) {
 f.content = e.target.value;
 UI.updateLines();
@@ -1196,41 +1095,41 @@ clearTimeout(State.autoRunTimer);
 State.autoRunTimer = setTimeout(Engine.run, 600);
 }
 });
-​let isSyncing = false;
-Els.editor.addEventListener('scroll', () => {
+​var isSyncing = false;
+Els.editor.addEventListener('scroll', function() {
 if (!isSyncing) {
-window.requestAnimationFrame(() => {
+window.requestAnimationFrame(function() {
 Els.lines.scrollTop = Els.editor.scrollTop;
 isSyncing = false;
 });
 isSyncing = true;
 }
 }, { passive: true });
-​Els.editor.addEventListener('keyup', () => UI.updateActiveLine());
-Els.editor.addEventListener('click', () => UI.updateActiveLine());
-​Els.editor.addEventListener('keydown', (e) => {
-const val = Els.editor.value;
-const start = Els.editor.selectionStart;
-const end = Els.editor.selectionEnd;
+​Els.editor.addEventListener('keyup', function() { UI.updateActiveLine(); });
+Els.editor.addEventListener('click', function() { UI.updateActiveLine(); });
+​Els.editor.addEventListener('keydown', function(e) {
+var val = Els.editor.value;
+var start = Els.editor.selectionStart;
+var end = Els.editor.selectionEnd;
 ​if (e.key === 'Tab') {
 e.preventDefault();
 Els.editor.value = val.substring(0, start) + "  " + val.substring(end);
 Els.editor.selectionStart = Els.editor.selectionEnd = start + 2;
 Els.editor.dispatchEvent(new Event('input'));
-} else if (['{', '(', '[', '"', "'"].includes(e.key)) {
-const pairs = { '{': '}', '(': ')', '[': ']', '"': '"', "'": "'" };
+} else if (['{', '(', '[', '"', "'"].indexOf(e.key) !== -1) {
+var pairs = { '{': '}', '(': ')', '[': ']', '"': '"', "'": "'" };
 e.preventDefault();
-const selected = val.substring(start, end);
+var selected = val.substring(start, end);
 Els.editor.value = val.substring(0, start) + e.key + selected + pairs[e.key] + val.substring(end);
 Els.editor.selectionStart = start + 1;
 Els.editor.selectionEnd = end + 1;
 Els.editor.dispatchEvent(new Event('input'));
 } else if (e.key === 'Enter') {
-const curLine = val.substring(0, start).split('\n').pop();
-const indent = (curLine.match(/^\s*/) || [''])[0];
+var curLine = val.substring(0, start).split('\n').pop();
+var indent = (curLine.match(/^\s*/) || [''])[0];
 if (curLine.trim().endsWith('{') || curLine.trim().endsWith('(') || curLine.trim().endsWith('[')) {
 e.preventDefault();
-const extraIndent = indent + '  ';
+var extraIndent = indent + '  ';
 Els.editor.value = val.substring(0, start) + '\n' + extraIndent + '\n' + indent + val.substring(end);
 Els.editor.selectionStart = Els.editor.selectionEnd = start + extraIndent.length + 1;
 Els.editor.dispatchEvent(new Event('input'));
@@ -1243,11 +1142,11 @@ Els.editor.dispatchEvent(new Event('input'));
 }
 });
 },
-​updateActiveLine: () => {
-const cursorPos = Els.editor.selectionStart;
-const activeIndex = Els.editor.value.substring(0, cursorPos).split('\n').length;
-const lineElements = Els.lines.children;
-for (let i = 0; i < lineElements.length; i++) {
+​updateActiveLine: function() {
+var cursorPos = Els.editor.selectionStart;
+var activeIndex = Els.editor.value.substring(0, cursorPos).split('\n').length;
+var lineElements = Els.lines.children;
+for (var i = 0; i < lineElements.length; i++) {
 if (i + 1 === activeIndex) {
 lineElements[i].classList.add('active-line-num');
 } else {
@@ -1255,27 +1154,27 @@ lineElements[i].classList.remove('active-line-num');
 }
 }
 },
-​updateLines: () => {
-const count = Els.editor.value.split('\n').length;
-let html = '';
-for (let i = 1; i <= (count || 1); i++) {
-html += <div style="height:24px; line-height:24px;">${i}</div>;
+​updateLines: function() {
+var count = Els.editor.value.split('\n').length;
+var html = '';
+for (var i = 1; i <= (count || 1); i++) {
+html += '<div style="height:24px; line-height:24px;">' + i + '</div>';
 }
 Els.lines.innerHTML = html;
 UI.updateActiveLine();
 },
-​formatCode: () => {
-const f = State.files.find(x => x.id === State.activeFileId);
+​formatCode: function() {
+var f = State.files.find(function(x) { return x.id === State.activeFileId; });
 if (!f || !f.content) return;
-const lines = f.content.split('\n');
-let indent = 0;
-const formatted = [];
-​lines.forEach(l => {
-const trim = l.trim();
+var lines = f.content.split('\n');
+var indent = 0;
+var formatted = [];
+​lines.forEach(function(l) {
+var trim = l.trim();
 if (!trim) { formatted.push(''); return; }
 if (trim.match(/^[}])]/) || trim.match(/^<//)) indent = Math.max(0, indent - 1);
 formatted.push('  '.repeat(indent) + trim);
-if (trim.match(/[{([]/) || (trim.match(/<[a-zA-Z0-9]+[^>]*>/) && !trim.includes('</') && !trim.endsWith('/>'))) indent++;
+if (trim.match(/[{([]/) || (trim.match(/<[a-zA-Z0-9]+[^>]*>/) && trim.indexOf('</') === -1 && !trim.endsWith('/>'))) indent++;
 });
 ​f.content = formatted.join('\n');
 Els.editor.value = f.content;
@@ -1283,26 +1182,26 @@ UI.updateLines();
 Workspace.saveImmediate();
 UI.showToast("Formatted");
 },
-​setupSplitterEvents: () => {
-let isDragging = false;
-const onMove = (clientX) => {
+​setupSplitterEvents: function() {
+var isDragging = false;
+function onMove(clientX) {
 if (!isDragging) return;
-const rect = document.getElementById('workspace-splitter-container').getBoundingClientRect();
-let pct = ((clientX - rect.left) / rect.width) * 100;
+var rect = document.getElementById('workspace-splitter-container').getBoundingClientRect();
+var pct = ((clientX - rect.left) / rect.width) * 100;
 if (pct > 15 && pct < 85) {
-Els.editorCol.style.width = ${pct}%;
-Els.previewCol.style.width = ${100 - pct}%;
+Els.editorCol.style.width = pct + '%';
+Els.previewCol.style.width = (100 - pct) + '%';
 }
-};
-​Els.resizer.addEventListener('mousedown', () => { isDragging = true; Els.resizer.classList.add('dragging'); });
-window.addEventListener('mousemove', (e) => onMove(e.clientX));
-window.addEventListener('mouseup', () => { isDragging = false; Els.resizer.classList.remove('dragging'); });
-​Els.resizer.addEventListener('touchstart', () => { isDragging = true; }, { passive: true });
-window.addEventListener('touchmove', (e) => { if (isDragging) onMove(e.touches[0].clientX); }, { passive: true });
-window.addEventListener('touchend', () => { isDragging = false; });
+}
+​Els.resizer.addEventListener('mousedown', function() { isDragging = true; Els.resizer.classList.add('dragging'); });
+window.addEventListener('mousemove', function(e) { onMove(e.clientX); });
+window.addEventListener('mouseup', function() { isDragging = false; Els.resizer.classList.remove('dragging'); });
+​Els.resizer.addEventListener('touchstart', function() { isDragging = true; }, { passive: true });
+window.addEventListener('touchmove', function(e) { if (isDragging) onMove(e.touches[0].clientX); }, { passive: true });
+window.addEventListener('touchend', function() { isDragging = false; });
 },
-​setupKeyboardShortcuts: () => {
-window.addEventListener('keydown', (e) => {
+​setupKeyboardShortcuts: function() {
+window.addEventListener('keydown', function(e) {
 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 e.preventDefault();
 Engine.run();
@@ -1314,59 +1213,68 @@ PrintEngine.print();
 }
 });
 },
-​renderWorkspaceUI: () => {
-// Render file explorer
-Els.fileList.innerHTML = State.files.map(f => {
-const isActive = (State.activeFileId === f.id);
-return  <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 10px; border-radius:10px; cursor:pointer; background:${isActive ? 'rgba(255,255,255,0.1)' : 'transparent'}; color:${isActive ? '#FFF' : '#8E8E93'}; font-size:12px;" onclick="Workspace.setActiveFile('${f.id}'); if(window.innerWidth<768) UI.toggleSidebar();"> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${f.name}</span> <div style="display:flex; align-items:center; gap:2px;"> <button onclick="event.stopPropagation(); Workspace.renameFile('${f.id}')" style="background:transparent; border:none; color:inherit; padding:2px; cursor:pointer;" title="Rename"> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg> </button> <button onclick="event.stopPropagation(); Workspace.deleteFile('${f.id}')" style="background:transparent; border:none; color:inherit; padding:2px; cursor:pointer;" title="Delete"> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> </button> </div> </div>;
+​renderWorkspaceUI: function() {
+Els.fileList.innerHTML = State.files.map(function(f) {
+var isActive = (State.activeFileId === f.id);
+return '<div style="display:flex; align-items:center; justify-content:space-between; padding:6px 10px; border-radius:10px; cursor:pointer; background:' + (isActive ? 'rgba(255,255,255,0.1)' : 'transparent') + '; color:' + (isActive ? '#FFF' : '#8E8E93') + '; font-size:12px;" onclick="Workspace.setActiveFile(\'' + f.id + '\'); if(window.innerWidth<768) UI.toggleSidebar();">' +
+'<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">' + f.name + '</span>' +
+'<div style="display:flex; align-items:center; gap:2px;">' +
+'<button onclick="event.stopPropagation(); Workspace.renameFile(\'' + f.id + '\')" style="background:transparent; border:none; color:inherit; padding:2px; cursor:pointer;" title="Rename">' +
+'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>' +
+'</button>' +
+'<button onclick="event.stopPropagation(); Workspace.deleteFile(\'' + f.id + '\')" style="background:transparent; border:none; color:inherit; padding:2px; cursor:pointer;" title="Delete">' +
+'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
+'</button>' +
+'</div>' +
+'</div>';
 }).join('');
-​// Render editor tabs
-Els.openTabs.innerHTML = State.files.map(f => {
-const isActive = (State.activeFileId === f.id);
-return  <div onclick="Workspace.setActiveFile('${f.id}')" style="display:flex; align-items:center; height:100%; padding:0 12px; cursor:pointer; border-radius:8px; font-size:12px; font-weight:500; background:${isActive ? 'rgba(255,255,255,0.1)' : 'transparent'}; color:${isActive ? '#FFF' : '#8E8E93'};"> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px;">${f.name}</span> </div>;
+​Els.openTabs.innerHTML = State.files.map(function(f) {
+var isActive = (State.activeFileId === f.id);
+return '<div onclick="Workspace.setActiveFile(\'' + f.id + '\')" style="display:flex; align-items:center; height:100%; padding:0 12px; cursor:pointer; border-radius:8px; font-size:12px; font-weight:500; background:' + (isActive ? 'rgba(255,255,255,0.1)' : 'transparent') + '; color:' + (isActive ? '#FFF' : '#8E8E93') + ';">' +
+'<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px;">' + f.name + '</span>' +
+'</div>';
 }).join('');
-​const active = State.files.find(f => f.id === State.activeFileId);
+​var active = State.files.find(function(f) { return f.id === State.activeFileId; });
 Els.editor.value = active ? active.content : '';
 UI.updateLines();
 }
 };
-​// --- Workspace & File Storage ---
-const Workspace = {
+​// Workspace & Storage
+var Workspace = {
 saveTimer: null,
-​init: () => {
+​init: function() {
 try {
-const raw = localStorage.getItem('nova_studio_workspaces');
+var raw = localStorage.getItem('nova_studio_workspaces_v3');
 if (raw) State.projects = JSON.parse(raw);
 } catch (e) {
 State.projects = {};
 }
 ​if (!State.projects || Object.keys(State.projects).length === 0) {
-const id = 'proj_' + Date.now();
-State.projects = {
-[id]: {
-id,
+var id = 'proj_' + Date.now();
+State.projects = {};
+State.projects[id] = {
+id: id,
 name: 'Workspace',
 files: JSON.parse(JSON.stringify(Templates.empty)),
 updated: Date.now()
-}
 };
 }
 ​State.currentProjId = Object.keys(State.projects)[0];
 UI.switchView('home');
 },
-​save: () => {
+​save: function() {
 clearTimeout(Workspace.saveTimer);
 Workspace.saveTimer = setTimeout(Workspace.saveImmediate, 350);
 },
-​saveImmediate: () => {
+​saveImmediate: function() {
 if (State.currentProjId && State.projects[State.currentProjId]) {
 State.projects[State.currentProjId].files = JSON.parse(JSON.stringify(State.files));
 State.projects[State.currentProjId].updated = Date.now();
 }
-localStorage.setItem('nova_studio_workspaces', JSON.stringify(State.projects));
+localStorage.setItem('nova_studio_workspaces_v3', JSON.stringify(State.projects));
 },
-​loadActiveProject: () => {
-const p = State.projects[State.currentProjId];
+​loadActiveProject: function() {
+var p = State.projects[State.currentProjId];
 if (!p) return;
 State.files = JSON.parse(JSON.stringify(p.files || []));
 State.activeFileId = State.files.length > 0 ? State.files[0].id : null;
@@ -1375,62 +1283,83 @@ document.getElementById('mobile-proj-name').innerText = p.name;
 UI.renderWorkspaceUI();
 Engine.run();
 },
-​setActiveFile: (id) => {
+​setActiveFile: function(id) {
 State.activeFileId = id;
 UI.renderWorkspaceUI();
 },
-​confirmCreate: () => {
-const name = document.getElementById('new-workspace-name').value.trim() || 'Workspace';
-const template = document.getElementById('new-workspace-template').value;
-const id = 'proj_' + Date.now();
-​const files = JSON.parse(JSON.stringify(Templates[template] || Templates.empty));
-State.projects[id] = { id, name, files, updated: Date.now() };
+​confirmCreate: function() {
+var name = document.getElementById('new-workspace-name').value.trim() || 'Workspace';
+var template = document.getElementById('new-workspace-template').value;
+var id = 'proj_' + Date.now();
+​var files = JSON.parse(JSON.stringify(Templates[template] || Templates.empty));
+State.projects[id] = { id: id, name: name, files: files, updated: Date.now() };
 ​Workspace.saveImmediate();
 UI.hideNewProjectModal();
 Workspace.open(id);
 },
-​open: (id) => {
+​open: function(id) {
 State.currentProjId = id;
 UI.switchView('ide');
 },
-​renderHome: () => {
-const projs = Object.values(State.projects).sort((a, b) => b.updated - a.updated);
-Els.cardsContainer.innerHTML = projs.map(p => <div class="workspace-card" onclick="Workspace.open('${p.id}')"> <div style="display:flex; justify-content:space-between; align-items:flex-start;"> <div style="display:flex; align-items:center; gap:10px;"> <div style="width:34px; height:34px; border-radius:10px; background:rgba(10,132,255,0.15); border:1px solid rgba(10,132,255,0.25); display:flex; align-items:center; justify-content:center; color:var(--apple-blue);"> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> </div> <div> <h3 style="font-size:14px; font-weight:600; color:#FFFFFF; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:160px;">${p.name}</h3> <span style="font-size:11px; color:var(--text-secondary);">${(p.files || []).length} file${(p.files || []).length === 1 ? '' : 's'}</span> </div> </div> <button onclick="event.stopPropagation(); Workspace.deleteWorkspace('${p.id}')" style="background:transparent; border:none; color:var(--text-tertiary); cursor:pointer; padding:4px;" title="Delete"> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> </button> </div> <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-secondary); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;"> <span>Ready</span> <span style="color:var(--apple-blue); font-weight:600; display:flex; align-items:center; gap:2px;">Open &rarr;</span> </div> </div>).join('');
+​renderHome: function() {
+var projs = Object.values(State.projects).sort(function(a, b) { return b.updated - a.updated; });
+Els.cardsContainer.innerHTML = projs.map(function(p) {
+return '<div class="workspace-card" onclick="Workspace.open(\'' + p.id + '\')">' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
+'<div style="display:flex; align-items:center; gap:10px;">' +
+'<div style="width:34px; height:34px; border-radius:10px; background:rgba(10,132,255,0.15); border:1px solid rgba(10,132,255,0.25); display:flex; align-items:center; justify-content:center; color:var(--apple-blue);">' +
+'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' +
+'</div>' +
+'<div>' +
+'<h3 style="font-size:14px; font-weight:600; color:#FFFFFF; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:160px;">' + p.name + '</h3>' +
+'<span style="font-size:11px; color:var(--text-secondary);">' + (p.files || []).length + ' file' + ((p.files || []).length === 1 ? '' : 's') + '</span>' +
+'</div>' +
+'</div>' +
+'<button onclick="event.stopPropagation(); Workspace.deleteWorkspace(\'' + p.id + '\')" style="background:transparent; border:none; color:var(--text-tertiary); cursor:pointer; padding:4px;" title="Delete">' +
+'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
+'</button>' +
+'</div>' +
+'<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-secondary); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">' +
+'<span>Ready</span>' +
+'<span style="color:var(--apple-blue); font-weight:600; display:flex; align-items:center; gap:2px;">Open →</span>' +
+'</div>' +
+'</div>';
+}).join('');
 },
-​createFile: async () => {
-const name = await Dialog.prompt("New File", "Enter file name:", "App.jsx");
+​createFile: async function() {
+var name = await Dialog.prompt("New File", "Enter file name:", "App.jsx");
 if (name && name.trim()) {
-const ext = name.split('.').pop().toLowerCase();
-const lang = (ext === 'js' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') ? 'javascript' : ext;
-const f = { id: Date.now().toString(), name: name.trim(), language: lang, content: '' };
+var ext = name.split('.').pop().toLowerCase();
+var lang = (ext === 'js' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') ? 'javascript' : ext;
+var f = { id: Date.now().toString(), name: name.trim(), language: lang, content: '' };
 State.files.push(f);
 State.activeFileId = f.id;
 Workspace.saveImmediate();
 UI.renderWorkspaceUI();
 }
 },
-​renameFile: async (id) => {
-const f = State.files.find(x => x.id === id);
+​renameFile: async function(id) {
+var f = State.files.find(function(x) { return x.id === id; });
 if (!f) return;
-const name = await Dialog.prompt("Rename File", "New filename:", f.name);
+var name = await Dialog.prompt("Rename File", "New filename:", f.name);
 if (name && name.trim()) {
 f.name = name.trim();
-const ext = f.name.split('.').pop().toLowerCase();
+var ext = f.name.split('.').pop().toLowerCase();
 f.language = (ext === 'js' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') ? 'javascript' : ext;
 Workspace.saveImmediate();
 UI.renderWorkspaceUI();
 }
 },
-​deleteFile: async (id) => {
+​deleteFile: async function(id) {
 if (State.files.length <= 1) return Dialog.alert("Notice", "At least one file is required.");
 if (await Dialog.confirm("Delete File", "Are you sure you want to delete this file?")) {
-State.files = State.files.filter(x => x.id !== id);
+State.files = State.files.filter(function(x) { return x.id !== id; });
 State.activeFileId = State.files[0].id;
 Workspace.saveImmediate();
 UI.renderWorkspaceUI();
 }
 },
-​deleteWorkspace: async (id) => {
+​deleteWorkspace: async function(id) {
 if (Object.keys(State.projects).length <= 1) return Dialog.alert("Notice", "At least one workspace must remain.");
 if (await Dialog.confirm("Delete Workspace", "Permanently delete this workspace?")) {
 delete State.projects[id];
@@ -1438,82 +1367,90 @@ Workspace.saveImmediate();
 Workspace.renderHome();
 }
 },
-​copyActiveFile: () => {
-const f = State.files.find(x => x.id === State.activeFileId);
+​copyActiveFile: function() {
+var f = State.files.find(function(x) { return x.id === State.activeFileId; });
 if (!f) return;
-navigator.clipboard.writeText(f.content).then(() => UI.showToast("Copied to clipboard"));
+navigator.clipboard.writeText(f.content).then(function() { UI.showToast("Copied to clipboard"); });
 },
-​compileDocument: () => {
-const htmlFile = State.files.find(f => f.name.endsWith('.html'));
-let html = htmlFile ? htmlFile.content : '';
-​const cssFiles = State.files.filter(f => f.name.endsWith('.css'));
-const cssContent = cssFiles.map(f => f.content).join('\n');
-​const jsFiles = State.files.filter(f => f.name.endsWith('.js') || f.name.endsWith('.jsx') || f.name.endsWith('.ts') || f.name.endsWith('.tsx'));
-let rawJs = jsFiles.map(f => f.content).join('\n\n');
-const isReact = jsFiles.some(f => f.name.endsWith('.jsx') || f.content.includes('React') || f.content.includes('useState'));
-​let compiledJs = rawJs;
+​compileDocument: function() {
+var htmlFile = State.files.find(function(f) { return f.name.endsWith('.html'); });
+var html = htmlFile ? htmlFile.content : '';
+​var cssFiles = State.files.filter(function(f) { return f.name.endsWith('.css'); });
+var cssContent = cssFiles.map(function(f) { return f.content; }).join('\n');
+​var jsFiles = State.files.filter(function(f) {
+return f.name.endsWith('.js') || f.name.endsWith('.jsx') || f.name.endsWith('.ts') || f.name.endsWith('.tsx');
+});
+var rawJs = jsFiles.map(function(f) { return f.content; }).join('\n\n');
+var isReact = jsFiles.some(function(f) {
+return f.name.endsWith('.jsx') || f.content.indexOf('React') !== -1 || f.content.indexOf('useState') !== -1;
+});
+​var compiledJs = rawJs;
 if (isReact) {
 compiledJs = ReactEngine.transform(rawJs);
 }
-​// If workspace is completely blank, show clean empty canvas
+​// If completely empty canvas, return a clean blank workspace
 if (!html && !compiledJs && !cssContent) {
-return <!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;background:#08080C;color:#666;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;font-size:13px;}</style></head><body>Empty Workspace</body></html>;
+return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;background:#08080C;color:#666;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;font-size:13px;}</style></head><body>Empty Workspace</body></html>';
 }
+​var reactScripts = isReact ? (
+'\n  ' + S_START + ' src="https://unpkg.com/react@18/umd/react.production.min.js">' + S_END + '\n' +
+'  ' + S_START + ' src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js">' + S_END + '\n'
+) : '';
 ​if (!html) {
-html = <!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>App</title> ${isReact ? 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
- : ''} <style> ${cssContent} </style> </head> <body> ${isReact ? '<div id="root"></div>' : ''} <script> ${compiledJs} <\/script> </body> </html>;
+html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>App</title>' +
+reactScripts +
+'\n  <style>\n' + cssContent + '\n  </style>\n</head>\n<body>\n' +
+(isReact ? '  <div id="root"></div>\n' : '') +
+'  ' + S_START + '>\n' + compiledJs + '\n  ' + S_END + '\n</body>\n</html>';
 } else {
-if (isReact && !html.includes('react.production.min.js') && !html.includes('react.development.js')) {
-const scripts =  <script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script> <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>;
-html = html.includes('</head>') ? html.replace('</head>', ${scripts}\n</head>) : scripts + html;
+if (isReact && html.indexOf('react.production.min.js') === -1 && html.indexOf('react.development.js') === -1) {
+html = (html.indexOf('</head>') !== -1) ? html.replace('</head>', reactScripts + '</head>') : reactScripts + html;
 }
-​if (isReact && !html.includes('id="root"')) {
-html = html.includes('<body>') ? html.replace('<body>', '<body>\n  <div id="root"></div>') : '<div id="root"></div>' + html;
+​if (isReact && html.indexOf('id="root"') === -1) {
+html = (html.indexOf('<body>') !== -1) ? html.replace('<body>', '<body>\n  <div id="root"></div>') : '<div id="root"></div>' + html;
 }
 ​if (cssContent) {
-const styleTag = <style>\n${cssContent}\n</style>;
-html = html.includes('</head>') ? html.replace('</head>', ${styleTag}\n</head>) : styleTag + html;
+var styleTag = '<style>\n' + cssContent + '\n</style>';
+html = (html.indexOf('</head>') !== -1) ? html.replace('</head>', styleTag + '\n</head>') : styleTag + html;
 }
 ​if (compiledJs) {
-const scriptTag = <script>\n${compiledJs}\n<\/script>;
-html = html.includes('</body>') ? html.replace('</body>', ${scriptTag}\n</body>) : html + '\n' + scriptTag;
+var scriptTag = S_START + '>\n' + compiledJs + '\n' + S_END;
+html = (html.indexOf('</body>') !== -1) ? html.replace('</body>', scriptTag + '\n</body>') : html + '\n' + scriptTag;
 }
 }
 ​return html;
 },
-​downloadStandaloneHTML: () => {
-const doc = Workspace.compileDocument();
-const blob = new Blob([doc], { type: 'text/html' });
-const a = document.createElement('a');
+​downloadStandaloneHTML: function() {
+var doc = Workspace.compileDocument();
+var blob = new Blob([doc], { type: 'text/html' });
+var a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
-const p = State.projects[State.currentProjId];
-a.download = ${(p ? p.name : 'workspace').replace(/\s+/g, '-')}.html;
+var p = State.projects[State.currentProjId];
+a.download = (p ? p.name : 'workspace').replace(/\s+/g, '-') + '.html';
 a.click();
 URL.revokeObjectURL(a.href);
 UI.closeExportModal();
 UI.showToast("Exported Standalone HTML");
 },
-​copyCompiledCode: () => {
-const doc = Workspace.compileDocument();
-navigator.clipboard.writeText(doc).then(() => {
+​copyCompiledCode: function() {
+var doc = Workspace.compileDocument();
+navigator.clipboard.writeText(doc).then(function() {
 UI.closeExportModal();
 UI.showToast("Copied Compiled HTML");
 });
 },
-​openLiveTab: () => {
-const doc = Workspace.compileDocument();
-const blob = new Blob([doc], { type: 'text/html' });
-const url = URL.createObjectURL(blob);
+​openLiveTab: function() {
+var doc = Workspace.compileDocument();
+var blob = new Blob([doc], { type: 'text/html' });
+var url = URL.createObjectURL(blob);
 window.open(url, '_blank');
 }
 };
-​// --- React 18 & Babel Transformer ---
-const ReactEngine = {
-transform: (jsxCode) => {
+​// React 18 & Babel Transformer
+var ReactEngine = {
+transform: function(jsxCode) {
 if (!jsxCode || !jsxCode.trim()) return '';
-let clean = jsxCode;
+var clean = jsxCode;
 ​clean = clean.replace(/import\s+React\s*,\s*{([^}]+)}\s+from\s+['"]react['"];?/g, 'const {$1} = React;');
 clean = clean.replace(/import\s+{([^}]+)}\s+from\s+['"]react['"];?/g, 'const {$1} = React;');
 clean = clean.replace(/import\s+React\s+from\s+['"]react['"];?/g, '');
@@ -1522,8 +1459,8 @@ clean = clean.replace(/import\s+.?\s+from\s+['"].?['"];?/g, '');
 ​clean = clean.replace(/export\s+default\s+function\s+([a-zA-Z0-9_]+)/g, 'function $1');
 clean = clean.replace(/export\s+default\s+([a-zA-Z0-9_]+);?/g, '');
 clean = clean.replace(/export\s+const\s+/g, 'const ');
-​if (!clean.includes('ReactDOM.createRoot') && !clean.includes('ReactDOM.render')) {
-clean += \n\nif (typeof ReactDOM !== 'undefined' && document.getElementById('root')) {\n  const root = ReactDOM.createRoot(document.getElementById('root'));\n  root.render(React.createElement(App));\n};
+​if (clean.indexOf('ReactDOM.createRoot') === -1 && clean.indexOf('ReactDOM.render') === -1) {
+clean += '\n\nif (typeof ReactDOM !== "undefined" && document.getElementById("root")) {\n  const root = ReactDOM.createRoot(document.getElementById("root"));\n  root.render(React.createElement(App));\n}';
 }
 ​if (typeof Babel !== 'undefined') {
 try {
@@ -1536,32 +1473,44 @@ return clean;
 ​return clean;
 }
 };
-​// --- Sandbox Execution Engine ---
-const Engine = {
+​// Sandbox Execution Engine
+var Engine = {
 blobUrl: null,
-​run: () => {
+​run: function() {
 Engine.clearConsole();
-let doc = Workspace.compileDocument();
-​const interceptor = <script> window.onerror = function(msg, url, line) { window.parent.postMessage({ src: 'nova-console', type: 'error', msg: String(msg) + ' (Line ' + line + ')' }, '*'); return false; }; function safeStr(item) { try { return typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item); } catch(e) { return String(item); } } const _l = console.log, _w = console.warn, _e = console.error; console.log = function(...args) { window.parent.postMessage({ src:'nova-console', type:'log', msg: args.map(safeStr).join(' ') }, '*'); _l.apply(console, args); }; console.warn = function(...args) { window.parent.postMessage({ src:'nova-console', type:'warn', msg: args.map(safeStr).join(' ') }, '*'); _w.apply(console, args); }; console.error = function(...args) { window.parent.postMessage({ src:'nova-console', type:'error', msg: args.map(safeStr).join(' ') }, '*'); _e.apply(console, args); }; <\/script>;
-​if (doc.includes('<head>')) {
-doc = doc.replace('<head>', <head>\n${interceptor});
+var doc = Workspace.compileDocument();
+​var interceptor = S_START + '>\n' +
+'  window.onerror = function(msg, url, line) {\n' +
+'    window.parent.postMessage({ src: "nova-console", type: "error", msg: String(msg) + " (Line " + line + ")" }, "");\n' +
+'    return false;\n' +
+'  };\n' +
+'  function safeStr(item) {\n' +
+'    try { return typeof item === "object" && item !== null ? JSON.stringify(item) : String(item); } catch(e) { return String(item); }\n' +
+'  }\n' +
+'  const _l = console.log, _w = console.warn, _e = console.error;\n' +
+'  console.log = function(...args) { window.parent.postMessage({ src:"nova-console", type:"log", msg: args.map(safeStr).join(" ") }, ""); _l.apply(console, args); };\n' +
+'  console.warn = function(...args) { window.parent.postMessage({ src:"nova-console", type:"warn", msg: args.map(safeStr).join(" ") }, ""); _w.apply(console, args); };\n' +
+'  console.error = function(...args) { window.parent.postMessage({ src:"nova-console", type:"error", msg: args.map(safeStr).join(" ") }, ""); _e.apply(console, args); };\n' +
+S_END;
+​if (doc.indexOf('<head>') !== -1) {
+doc = doc.replace('<head>', '<head>\n' + interceptor);
 } else {
 doc = interceptor + doc;
 }
-​const blob = new Blob([doc], { type: 'text/html' });
+​var blob = new Blob([doc], { type: 'text/html' });
 if (Engine.blobUrl) URL.revokeObjectURL(Engine.blobUrl);
 Engine.blobUrl = URL.createObjectURL(blob);
 Els.iframe.src = Engine.blobUrl;
 },
-​clearConsole: () => {
+​clearConsole: function() {
 Els.consoleLogs.innerHTML = '<span style="color:var(--text-tertiary); font-style:italic;">Console ready</span>';
 document.getElementById('console-badge').style.display = 'none';
 },
-​logConsole: (type, msg) => {
+​logConsole: function(type, msg) {
 if (Els.consoleLogs.children.length === 1 && Els.consoleLogs.children[0].tagName === 'SPAN') {
 Els.consoleLogs.innerHTML = '';
 }
-const div = document.createElement('div');
+var div = document.createElement('div');
 div.style.color = (type === 'error') ? 'var(--apple-red)' : (type === 'warn') ? '#FFD60A' : '#FFFFFF';
 div.style.wordBreak = 'break-all';
 div.innerText = (type === 'error' ? '✖ ' : '• ') + msg;
@@ -1572,19 +1521,19 @@ document.getElementById('console-badge').style.display = 'block';
 }
 }
 };
-​// --- Preview Viewport Modes ---
-const Preview = {
-setMode: (mode) => {
+​// Viewport Mode Controls
+var Preview = {
+setMode: function(mode) {
 State.viewport = mode;
-const iframe = Els.iframe;
-['vp-mobile', 'vp-tablet', 'vp-desktop'].forEach(id => {
-const el = document.getElementById(id);
+var iframe = Els.iframe;
+['vp-mobile', 'vp-tablet', 'vp-desktop'].forEach(function(id) {
+var el = document.getElementById(id);
 if (el) {
 el.style.background = 'transparent';
 el.style.color = '#FFF';
 }
 });
-const activeBtn = document.getElementById(vp-${mode});
+var activeBtn = document.getElementById('vp-' + mode);
 if (activeBtn) {
 activeBtn.style.background = 'rgba(10,132,255,0.18)';
 activeBtn.style.color = 'var(--apple-blue)';
@@ -1607,13 +1556,13 @@ iframe.style.border = 'none';
 }
 }
 };
-​// Console postMessage bridge
-window.addEventListener('message', (e) => {
+​// Console Message Listener
+window.addEventListener('message', function(e) {
 if (e.data && e.data.src === 'nova-console') {
 Engine.logConsole(e.data.type, e.data.msg);
 }
 });
-​// Initialize App
+​// Boot App
 UI.init();
 Workspace.init();
 </script>
