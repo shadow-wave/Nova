@@ -4,37 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#030305">
+​<!-- PWA Meta -->
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NOVA Studio">
-<title>NOVA Studio</title>
-​<script>
-(function() {
-const svgIcon = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <defs> <radialGradient id="deepVoid" cx="50%" cy="20%" r="90%"> <stop offset="0%" stop-color="#0f172a"/> <stop offset="45%" stop-color="#070a12"/> <stop offset="100%" stop-color="#020204"/> </radialGradient> <radialGradient id="aura" cx="50%" cy="36%" r="65%"> <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95"/> <stop offset="35%" stop-color="#0A84FF" stop-opacity="0.85"/> <stop offset="70%" stop-color="#5E5CE6" stop-opacity="0.45"/> <stop offset="100%" stop-color="#0A84FF" stop-opacity="0"/> </radialGradient> <linearGradient id="rim" x1="0%" y1="0%" x2="100%" y2="100%"> <stop offset="0%" stop-color="#ffffff" stop-opacity="0.75"/> <stop offset="25%" stop-color="#ffffff" stop-opacity="0.2"/> <stop offset="70%" stop-color="#0A84FF" stop-opacity="0.3"/> <stop offset="100%" stop-color="#ffffff" stop-opacity="0.5"/> </linearGradient> <linearGradient id="beam" x1="15%" y1="0%" x2="85%" y2="100%"> <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.95"/> <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.5"/> <stop offset="100%" stop-color="#c084fc" stop-opacity="0.95"/> </linearGradient> <filter id="prismGlow" x="-30%" y="-30%" width="160%" height="160%"> <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur"/> <feMerge> <feMergeNode in="blur"/> <feMergeNode in="SourceGraphic"/> </feMerge> </filter> <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"> <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#0A84FF" flood-opacity="0.45"/> </filter> </defs> <rect width="512" height="512" rx="122" fill="url(#deepVoid)"/> <circle cx="256" cy="225" r="175" fill="url(#aura)" filter="url(#prismGlow)"/> <rect x="14" y="14" width="484" height="484" rx="110" fill="none" stroke="url(#rim)" stroke-width="4"/> <g filter="url(#softShadow)"> <path d="M256 112 L392 346 L120 346 Z" fill="none" stroke="url(#beam)" stroke-width="26" stroke-linejoin="round" stroke-linecap="round"/> <polygon points="256,172 334,318 178,318" fill="rgba(255,255,255,0.1)" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/> <circle cx="256" cy="272" r="26" fill="#ffffff" opacity="0.98"/> <circle cx="256" cy="272" r="14" fill="#0A84FF"/> <circle cx="256" cy="272" r="5" fill="#ffffff"/> </g> <path d="M72 122 C 145 62, 367 62, 440 122" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.45"/> </svg>;
-​const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgIcon);
-const iconLink = document.createElement('link');
-iconLink.rel = 'icon';
-iconLink.type = 'image/svg+xml';
-iconLink.href = svgUrl;
-document.head.appendChild(iconLink);
-​const canvas = document.createElement('canvas');
-canvas.width = 192; canvas.height = 192;
-const ctx = canvas.getContext('2d');
-const img = new Image();
-img.onload = () => {
-ctx.drawImage(img, 0, 0, 192, 192);
-const appleTouchLink = document.createElement('link');
-appleTouchLink.rel = 'apple-touch-icon';
-appleTouchLink.href = canvas.toDataURL('image/png');
-document.head.appendChild(appleTouchLink);
-};
-img.src = svgUrl;
-})();
-</script>
-​<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.0/babel.min.js"></script>
+<meta name="application-name" content="NOVA Studio">
+<link rel="manifest" href="manifest.json">
+​<title>NOVA Studio</title>
+​<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+​<!-- Runtime CDNs -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
-<script>
+​<script>
 tailwind.config = {
 darkMode: 'class',
 theme: {
@@ -59,10 +43,9 @@ teal: '#64D2FF'
 :root {
 --editor-line-height: 24px;
 --editor-font-size: 14px;
---editor-wrap: pre;
 --sidebar-width: 250px;
 --apple-blue: #0A84FF;
---panel-border: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+--panel-border: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 --smooth-curve: cubic-bezier(0.16, 1, 0.3, 1);
 }
 ​* {
@@ -90,20 +73,20 @@ inset: 0;
 z-index: 0;
 pointer-events: none;
 background:
-radial-gradient(circle at 15% 15%, rgba(10, 132, 255, 0.07) 0%, transparent 45%),
-radial-gradient(circle at 85% 85%, rgba(94, 92, 230, 0.06) 0%, transparent 45%),
+radial-gradient(circle at 12% 15%, rgba(10, 132, 255, 0.08) 0%, transparent 40%),
+radial-gradient(circle at 88% 85%, rgba(94, 92, 230, 0.07) 0%, transparent 45%),
 #040406;
 }
 ​.panel {
-background: rgba(18, 18, 22, 0.82);
-backdrop-filter: blur(40px) saturate(190%);
--webkit-backdrop-filter: blur(40px) saturate(190%);
+background: rgba(18, 18, 22, 0.85);
+backdrop-filter: blur(35px) saturate(180%);
+-webkit-backdrop-filter: blur(35px) saturate(180%);
 box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), var(--panel-border);
 }
 ​.panel-subtle {
-background: rgba(22, 22, 28, 0.6);
-backdrop-filter: blur(30px);
--webkit-backdrop-filter: blur(30px);
+background: rgba(20, 20, 26, 0.65);
+backdrop-filter: blur(25px);
+-webkit-backdrop-filter: blur(25px);
 box-shadow: var(--panel-border);
 }
 ​.apple-btn {
@@ -111,16 +94,16 @@ display: inline-flex;
 align-items: center;
 justify-content: center;
 cursor: pointer;
-transition: all 0.2s var(--smooth-curve);
+transition: all 0.18s var(--smooth-curve);
 user-select: none;
 touch-action: manipulation;
 }
 .apple-btn:active {
-transform: scale(0.95);
+transform: scale(0.96);
 opacity: 0.85;
 }
 ​.segmented-container {
-background: rgba(0, 0, 0, 0.5);
+background: rgba(0, 0, 0, 0.45);
 border: 1px solid rgba(255, 255, 255, 0.08);
 border-radius: 9999px;
 padding: 3px;
@@ -133,10 +116,10 @@ position: absolute;
 top: 3px;
 bottom: 3px;
 left: 3px;
-background: rgba(255, 255, 255, 0.15);
+background: rgba(255, 255, 255, 0.14);
 border-radius: 9999px;
 border: 1px solid rgba(255, 255, 255, 0.16);
-transition: transform 0.3s var(--smooth-curve), width 0.3s var(--smooth-curve);
+transition: transform 0.28s var(--smooth-curve), width 0.28s var(--smooth-curve);
 pointer-events: none;
 z-index: 1;
 }
@@ -148,7 +131,7 @@ font-size: 12px;
 font-weight: 500;
 border-radius: 9999px;
 color: rgba(235, 235, 245, 0.6);
-transition: color 0.2s ease;
+transition: color 0.18s ease;
 cursor: pointer;
 background: transparent;
 border: none;
@@ -157,9 +140,28 @@ border: none;
 color: #FFFFFF;
 font-weight: 600;
 }
-​.view-transition { transition: opacity 0.24s ease, transform 0.28s var(--smooth-curve); }
-.view-hidden { opacity: 0; transform: scale(0.985); pointer-events: none; position: absolute; inset: 0; z-index: -1; visibility: hidden; }
-.view-active { opacity: 1; transform: scale(1); pointer-events: auto; position: absolute; inset: 0; z-index: 20; display: flex; visibility: visible; }
+​.view-transition {
+transition: opacity 0.22s ease, transform 0.25s var(--smooth-curve);
+}
+.view-hidden {
+opacity: 0;
+transform: scale(0.985);
+pointer-events: none;
+position: absolute;
+inset: 0;
+z-index: -1;
+visibility: hidden;
+}
+.view-active {
+opacity: 1;
+transform: scale(1);
+pointer-events: auto;
+position: absolute;
+inset: 0;
+z-index: 20;
+display: flex;
+visibility: visible;
+}
 ​.editor-container {
 position: relative;
 width: 100%;
@@ -170,41 +172,17 @@ min-height: 0;
 min-width: 0;
 background: #08080c;
 }
-​.editor-textarea, .editor-pre, #line-numbers {
+​#line-numbers {
 font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 font-size: var(--editor-font-size) !important;
 line-height: var(--editor-line-height) !important;
-padding-top: 1.25rem !important;
+padding-top: 1rem !important;
 padding-bottom: 5rem !important;
-letter-spacing: 0px !important;
-}
-​.editor-textarea, .editor-pre {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-padding-left: 1.25rem !important;
-padding-right: 1.25rem !important;
-margin: 0 !important;
-border: none !important;
-outline: none !important;
-white-space: var(--editor-wrap) !important;
-word-spacing: normal !important;
-word-break: normal !important;
-tab-size: 2 !important;
-box-sizing: border-box !important;
-overflow: auto !important;
--webkit-overflow-scrolling: touch;
-overscroll-behavior: contain;
-will-change: scroll-position;
-}
-​#line-numbers {
 padding-right: 0.85rem !important;
 padding-left: 0.65rem !important;
 overflow-y: hidden !important;
 text-align: right;
-color: #43434c;
+color: #4b4b57;
 user-select: none;
 background: #07070a;
 border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -216,46 +194,85 @@ color: #0A84FF !important;
 font-weight: 700;
 }
 ​.editor-textarea {
-color: transparent;
-background: transparent;
+font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+font-size: var(--editor-font-size) !important;
+line-height: var(--editor-line-height) !important;
+padding: 1rem 1.25rem 5rem 1.25rem !important;
+color: #f1f5f9;
+background: #08080c;
 caret-color: #0A84FF;
-z-index: 2;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+margin: 0 !important;
+border: none !important;
+outline: none !important;
+white-space: pre !important;
+tab-size: 2 !important;
+box-sizing: border-box !important;
+overflow: auto !important;
+-webkit-overflow-scrolling: touch;
+overscroll-behavior: contain;
 resize: none;
 user-select: text;
 }
-.editor-textarea::selection { background-color: rgba(10, 132, 255, 0.35); color: transparent; }
-.editor-pre { z-index: 1; pointer-events: none; color: #f4f4f7; user-select: none; }
-​.syn-keyword { color: #FF6482; font-weight: 600; }
-.syn-string { color: #FFD60A; }
-.syn-number { color: #32D74B; }
-.syn-comment { color: #6E6E73; font-style: italic; }
-.syn-function { color: #64D2FF; font-weight: 500; }
-.syn-tag { color: #FF6482; }
-.syn-attr { color: #FF9F0A; }
-.syn-property { color: #BF5AF2; }
-​.mobile-quick-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.editor-textarea::selection {
+background-color: rgba(10, 132, 255, 0.35);
+}
+​.mobile-quick-bar {
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+scrollbar-width: none;
+}
 .mobile-symbol-btn {
-flex-shrink: 0; min-width: 36px; height: 32px; border-radius: 8px;
-background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08);
-font-family: ui-monospace, monospace; font-size: 13px; font-weight: 600;
-display: inline-flex; align-items: center; justify-content: center; color: #f4f4f6;
+flex-shrink: 0;
+min-width: 38px;
+height: 32px;
+border-radius: 8px;
+background: rgba(255, 255, 255, 0.06);
+border: 1px solid rgba(255, 255, 255, 0.08);
+font-family: ui-monospace, monospace;
+font-size: 13px;
+font-weight: 600;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+color: #f4f4f6;
 transition: all 0.15s ease;
 }
-.mobile-symbol-btn:active { background: #0A84FF; color: #FFFFFF; }
+.mobile-symbol-btn:active {
+background: #0A84FF;
+color: #FFFFFF;
+}
 ​#resizer {
-width: 16px; margin-left: -8px; margin-right: -8px;
-cursor: col-resize; position: relative; z-index: 30;
-display: flex; justify-content: center; align-items: center; touch-action: none;
+width: 16px;
+margin-left: -8px;
+margin-right: -8px;
+cursor: col-resize;
+position: relative;
+z-index: 30;
+display: flex;
+justify-content: center;
+align-items: center;
+touch-action: none;
 }
 #resizer .resizer-line {
-width: 3.5px; height: 44px; background: rgba(255,255,255,0.16);
-border-radius: 99px; transition: all 0.22s var(--smooth-curve);
+width: 3.5px;
+height: 44px;
+background: rgba(255,255,255,0.16);
+border-radius: 99px;
+transition: all 0.22s var(--smooth-curve);
 }
 #resizer:hover .resizer-line, #resizer.dragging .resizer-line {
-background: #0A84FF; height: 70px; width: 4px; box-shadow: 0 0 14px rgba(10,132,255,0.6);
+background: #0A84FF;
+height: 70px;
+width: 4px;
+box-shadow: 0 0 14px rgba(10,132,255,0.6);
 }
 ​.modal-backdrop {
-background: rgba(0, 0, 0, 0.7);
+background: rgba(0, 0, 0, 0.72);
 backdrop-filter: blur(28px);
 -webkit-backdrop-filter: blur(28px);
 }
@@ -266,28 +283,66 @@ border-radius: 22px;
 box-shadow: 0 32px 64px -14px rgba(0, 0, 0, 0.8), var(--panel-border);
 }
 ​.loader-bar {
-height: 2.5px; background: #0A84FF; width: 30%; position: absolute; top: 0; left: -30%;
-animation: sweep 0.85s ease infinite; z-index: 50; display: none;
+height: 2.5px;
+background: #0A84FF;
+width: 30%;
+position: absolute;
+top: 0;
+left: -30%;
+animation: sweep 0.85s ease infinite;
+z-index: 50;
+display: none;
 box-shadow: 0 0 12px #0A84FF;
 }
-@keyframes sweep { 0% { left: -30%; width: 10%; } 50% { width: 50%; } 100% { left: 100%; width: 10%; } }
-​.viewport-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 0; min-width: 0; }
-.viewport-mobile iframe { max-width: 375px; max-height: 740px; border-radius: 36px; border: 7px solid rgba(255,255,255,0.08); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-.viewport-tablet iframe { max-width: 768px; max-height: 940px; border-radius: 22px; border: 7px solid rgba(255,255,255,0.08); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-.viewport-desktop iframe { max-width: 100%; max-height: 100%; border-radius: 0; border: none; }
+@keyframes sweep {
+0% { left: -30%; width: 10%; }
+50% { width: 50%; }
+100% { left: 100%; width: 10%; }
+}
+​.viewport-container {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+height: 100%;
+min-height: 0;
+min-width: 0;
+}
+.viewport-mobile iframe {
+max-width: 375px;
+max-height: 740px;
+border-radius: 36px;
+border: 7px solid rgba(255,255,255,0.08);
+box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+.viewport-tablet iframe {
+max-width: 768px;
+max-height: 940px;
+border-radius: 22px;
+border: 7px solid rgba(255,255,255,0.08);
+box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+.viewport-desktop iframe {
+max-width: 100%;
+max-height: 100%;
+border-radius: 0;
+border: none;
+}
 </style>
 </head>
 <body class="flex flex-col font-sans selection:bg-apple-blue/30 overflow-hidden relative">
 ​<div class="ambient-mesh"></div>
-​<div id="splash-screen" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-opacity duration-400">
-<div class="w-16 h-16 rounded-2xl panel flex items-center justify-center text-white mb-3">
-<i data-lucide="sparkles" class="w-8 h-8 text-apple-blue"></i>
+​<!-- Splash Screen -->
+<div id="splash-screen" class="fixed inset-0 z-50 bg-[#030305] flex flex-col items-center justify-center transition-opacity duration-300">
+<div class="w-14 h-14 rounded-2xl panel flex items-center justify-center text-white mb-3">
+<i data-lucide="sparkles" class="w-7 h-7 text-apple-blue"></i>
 </div>
-<span class="text-base font-bold tracking-tight text-white">NOVA Studio</span>
+<span class="text-sm font-bold tracking-tight text-white">NOVA Studio</span>
 </div>
-​<iframe id="native-print-frame" class="hidden" style="display:none; visibility:hidden; width:0; height:0;"></iframe>
+​<!-- Native Print Bridge Frame -->
+<iframe id="native-print-frame" style="position:fixed; right:0; bottom:0; width:0; height:0; border:none; visibility:hidden;"></iframe>
 ​<div class="absolute inset-0 flex flex-col overflow-hidden z-10" id="main-app">
-​<!-- HOME VIEW -->
+​<!-- HOME DASHBOARD VIEW -->
 <div id="home-view" class="view-transition view-active flex flex-col px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] md:p-6 lg:p-8 min-h-0 min-w-0">
 ​<header class="panel rounded-2xl h-[56px] flex-shrink-0 flex items-center justify-between px-4 sm:px-6 w-full max-w-5xl mx-auto mb-6">
 <div class="flex items-center gap-2.5">
@@ -296,18 +351,23 @@ box-shadow: 0 0 12px #0A84FF;
 </div>
 <span class="font-bold text-sm text-white tracking-tight">NOVA Studio</span>
 </div>
-​<button onclick="UI.showNewProjectModal()" class="apple-btn bg-apple-blue hover:bg-[#0071e3] text-white px-3.5 py-1.5 text-xs font-semibold gap-1.5 rounded-xl shadow-md shadow-apple-blue/20">
+​<div class="flex items-center gap-2">
+<button id="pwa-install-btn" class="hidden apple-btn bg-white/10 hover:bg-white/15 text-white px-3 py-1.5 text-xs font-semibold gap-1.5 rounded-xl border border-white/10">
+<i data-lucide="download" class="w-3.5 h-3.5 text-apple-blue"></i> Install App
+</button>
+<button onclick="UI.showNewProjectModal()" class="apple-btn bg-apple-blue hover:bg-[#0071e3] text-white px-3.5 py-1.5 text-xs font-semibold gap-1.5 rounded-xl shadow-md shadow-apple-blue/20">
 <i data-lucide="plus" class="w-3.5 h-3.5"></i> New Workspace
 </button>
+</div>
 </header>
 ​<div class="flex-1 overflow-y-auto touch-pan-y w-full max-w-5xl mx-auto min-h-0 min-w-0 pb-12">
 <div class="flex items-center justify-between mb-4">
-<h1 class="text-lg font-bold text-white tracking-tight">Workspaces</h1>
+<h1 class="text-base font-bold text-white tracking-tight">Workspaces</h1>
 </div>
 ​<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5" id="home-project-grid"></div>
 </div>
 </div>
-​<!-- IDE VIEW -->
+​<!-- IDE WORKSPACE VIEW -->
 <div id="ide-view" class="view-transition view-hidden absolute inset-0 flex flex-col md:flex-row md:p-3 lg:p-4 gap-0 md:gap-3 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] min-h-0 min-w-0">
 ​<!-- Mobile Header -->
 <header class="md:hidden h-[48px] panel border-b border-white/10 flex items-center justify-between px-3 flex-shrink-0 z-30">
@@ -327,12 +387,12 @@ box-shadow: 0 0 12px #0A84FF;
 <button onclick="UI.openExportModal()" class="apple-btn px-2.5 py-1.5 text-xs text-apple-blue bg-apple-blue/10 border border-apple-blue/20 rounded-lg gap-1.5 font-medium">
 <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Export
 </button>
-<button onclick="Engine.run()" class="apple-btn px-3 py-1.5 text-xs font-bold text-white bg-apple-blue hover:bg-[#0071e3] rounded-lg gap-1.5 shadow-sm shadow-apple-blue/30">
+<button onclick="Engine.run(); UI.setMobileTab('preview');" class="apple-btn px-3 py-1.5 text-xs font-bold text-white bg-apple-blue hover:bg-[#0071e3] rounded-lg gap-1.5 shadow-sm shadow-apple-blue/30">
 <i data-lucide="play" class="w-3 h-3 fill-current"></i> Run
 </button>
 </div>
 </header>
-​<!-- Sidebar -->
+​<!-- Sidebar (File Explorer) -->
 <aside id="sidebar" class="absolute md:relative w-[80vw] max-w-[270px] md:max-w-none h-full flex-shrink-0 flex flex-col panel md:rounded-2xl z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 min-h-0 min-w-0" style="width: var(--sidebar-width);">
 <div class="px-3.5 py-3 flex items-center justify-between border-b border-white/5 flex-shrink-0">
 <div class="flex items-center gap-2">
@@ -361,7 +421,7 @@ box-shadow: 0 0 12px #0A84FF;
 </div>
 </aside>
 <div id="sidebar-overlay" onclick="UI.toggleMobileSidebar()" class="absolute inset-0 bg-black/60 z-30 hidden md:hidden transition-opacity opacity-0 backdrop-blur-sm"></div>
-​<!-- Workspace Center -->
+​<!-- Workspace Main View -->
 <main class="flex-1 flex flex-col min-w-0 md:rounded-2xl panel overflow-hidden z-10 relative min-h-0">
 ​<!-- Desktop Header -->
 <header class="hidden md:flex h-[50px] flex-shrink-0 items-center justify-between px-3.5 border-b border-white/5 panel-subtle">
@@ -384,13 +444,13 @@ box-shadow: 0 0 12px #0A84FF;
 <button onclick="UI.openExportModal()" class="apple-btn px-2.5 py-1.5 text-xs font-medium text-zinc-200 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl gap-1.5">
 <i data-lucide="share-2" class="w-3.5 h-3.5 text-apple-blue"></i> Export
 </button>
-<button onclick="Engine.run()" class="apple-btn px-3 py-1.5 text-xs font-bold text-white bg-apple-blue hover:bg-[#0071e3] rounded-xl gap-1.5 shadow-sm shadow-apple-blue/25">
+<button onclick="Engine.run()" class="apple-btn px-3.5 py-1.5 text-xs font-bold text-white bg-apple-blue hover:bg-[#0071e3] rounded-xl gap-1.5 shadow-sm shadow-apple-blue/25">
 <i data-lucide="play" class="w-3 h-3 fill-current"></i> Run
 </button>
 </div>
 </header>
 ​<div id="workspace-container" class="flex-1 flex flex-col md:flex-row min-w-0 min-h-0 w-full relative">
-​<!-- Editor Well -->
+​<!-- Code Editor Well -->
 <section id="editor-section" class="flex flex-col min-w-0 min-h-0 w-full md:w-1/2 h-full z-10 relative flex-1 bg-[#08080c]">
 <div class="flex items-center justify-between bg-black/40 border-b border-white/5 h-[36px] w-full min-w-0 flex-shrink-0 px-1">
 <div id="editor-tabs" class="flex items-center h-full flex-1 min-w-0 gap-1 overflow-x-auto touch-pan-x scrollbar-hide"></div>
@@ -406,12 +466,11 @@ box-shadow: 0 0 12px #0A84FF;
 ​<div class="flex-1 flex overflow-hidden relative editor-container min-h-0 min-w-0" id="editor-wrapper">
 <div id="line-numbers" class="w-11 flex-shrink-0 flex flex-col items-end text-[11px] font-mono"></div>
 <div class="relative flex-1 h-full overflow-hidden min-h-0 min-w-0">
-<pre id="editor-pre" class="editor-pre" aria-hidden="true"></pre>
 <textarea id="code-editor" class="editor-textarea" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" data-gramm="false"></textarea>
 </div>
 </div>
-​<!-- Mobile Accessory Bar -->
-<div class="md:hidden h-[40px] bg-[#0c0c10] border-t border-white/10 flex items-center px-2 gap-1.5 mobile-quick-bar flex-shrink-0 z-30">
+​<!-- Mobile Quick Accessory Bar -->
+<div class="md:hidden h-[42px] bg-[#0c0c10] border-t border-white/10 flex items-center px-2 gap-1.5 mobile-quick-bar flex-shrink-0 z-30">
 <button onclick="document.execCommand('undo')" class="mobile-symbol-btn" title="Undo"><i data-lucide="undo-2" class="w-3.5 h-3.5"></i></button>
 <button onclick="document.execCommand('redo')" class="mobile-symbol-btn" title="Redo"><i data-lucide="redo-2" class="w-3.5 h-3.5"></i></button>
 <button onclick="UI.insertSymbol('<')" class="mobile-symbol-btn"><</button>
@@ -429,19 +488,20 @@ box-shadow: 0 0 12px #0A84FF;
 <button onclick="UI.insertSymbol('  ')" class="mobile-symbol-btn text-xs">Tab</button>
 </div>
 </section>
-​<div id="resizer" class="hidden md:flex flex-shrink-0"><div class="resizer-line"></div></div>
-​<!-- Preview Section -->
+​<!-- Splitter Handle (Desktop) -->
+<div id="resizer" class="hidden md:flex flex-shrink-0"><div class="resizer-line"></div></div>
+​<!-- Live Preview Well -->
 <section id="preview-section" class="flex flex-col min-w-0 min-h-0 w-full md:w-1/2 h-full relative z-10 hidden md:flex flex-1 bg-[#09090d] border-l md:border-l-0 border-white/5">
 <div id="loader" class="loader-bar"></div>
 ​<div class="h-[36px] bg-black/40 flex items-center justify-between border-b border-white/5 z-20 w-full min-w-0 px-2 flex-shrink-0">
 <div class="flex items-center gap-1">
-<button onclick="Preview.setViewport('mobile')" id="vp-mobile" class="apple-btn w-7 h-7 rounded-lg text-zinc-400 hover:text-white" title="Mobile">
+<button onclick="Preview.setViewport('mobile')" id="vp-mobile" class="apple-btn w-7 h-7 rounded-lg text-zinc-400 hover:text-white" title="Mobile View">
 <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
 </button>
-<button onclick="Preview.setViewport('tablet')" id="vp-tablet" class="apple-btn w-7 h-7 rounded-lg text-zinc-400 hover:text-white" title="Tablet">
+<button onclick="Preview.setViewport('tablet')" id="vp-tablet" class="apple-btn w-7 h-7 rounded-lg text-zinc-400 hover:text-white" title="Tablet View">
 <i data-lucide="tablet" class="w-3.5 h-3.5"></i>
 </button>
-<button onclick="Preview.setViewport('desktop')" id="vp-desktop" class="apple-btn w-7 h-7 rounded-lg text-apple-blue bg-apple-blue/10" title="Desktop">
+<button onclick="Preview.setViewport('desktop')" id="vp-desktop" class="apple-btn w-7 h-7 rounded-lg text-apple-blue bg-apple-blue/10" title="Desktop View">
 <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
 </button>
 </div>
@@ -462,7 +522,8 @@ box-shadow: 0 0 12px #0A84FF;
 <iframe id="preview-frame" sandbox="allow-scripts allow-modals allow-same-origin allow-popups" class="w-full h-full bg-[#08080b]"></iframe>
 </div>
 </div>
-​<div id="console-drawer" class="h-[120px] flex flex-col bg-[#0d0d12] border-t border-white/5 flex-shrink-0">
+​<!-- Console Output Well -->
+<div id="console-drawer" class="h-[120px] flex flex-col bg-[#0d0d12] border-t border-white/5 flex-shrink-0">
 <div class="flex justify-between items-center px-3 py-1.5 bg-black/40 border-b border-white/5 flex-shrink-0">
 <div class="flex items-center gap-1.5 text-zinc-400">
 <i data-lucide="terminal" class="w-3 h-3 text-apple-blue"></i>
@@ -476,7 +537,7 @@ box-shadow: 0 0 12px #0A84FF;
 </div>
 </section>
 </div>
-​<!-- Mobile Nav -->
+​<!-- Mobile Navigation Bar -->
 <nav class="md:hidden h-[48px] bg-[#0d0d12] border-t border-white/10 flex items-center justify-around px-2 flex-shrink-0 z-30">
 <button onclick="UI.setMobileTab('editor')" id="mob-tab-editor" class="flex flex-col items-center gap-0.5 text-apple-blue flex-1 py-1">
 <i data-lucide="code-2" class="w-4 h-4"></i>
@@ -507,15 +568,15 @@ box-shadow: 0 0 12px #0A84FF;
 ​<div class="p-4 flex flex-col gap-3.5">
 <div>
 <label class="text-[11px] text-zinc-400 font-medium uppercase tracking-wider block mb-1">Name</label>
-<input type="text" id="new-proj-name" placeholder="Workspace Name" autocomplete="off" class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-apple-blue transition">
+<input type="text" id="new-proj-name" placeholder="My Workspace" autocomplete="off" class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-apple-blue transition">
 </div>
 <div>
 <label class="text-[11px] text-zinc-400 font-medium uppercase tracking-wider block mb-1">Template</label>
 <select id="new-proj-template" class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-apple-blue transition cursor-pointer">
-<option value="empty">Empty Canvas (Zero Code)</option>
-<option value="printpdf">Printable Document</option>
-<option value="react">React 18</option>
-<option value="vanilla">HTML / CSS / JS</option>
+<option value="empty" selected>Empty Canvas (Zero Code - Completely Blank)</option>
+<option value="react">React 18 Starter</option>
+<option value="vanilla">HTML / CSS / JS Starter</option>
+<option value="printpdf">Printable Document / PDF</option>
 </select>
 </div>
 </div>
@@ -525,41 +586,50 @@ box-shadow: 0 0 12px #0A84FF;
 </div>
 </div>
 </div>
-​<!-- EXPORT MODAL -->
+​<!-- EXPORT & COMPILE MODAL -->
 <div id="export-overlay" class="hidden fixed inset-0 modal-backdrop z-[110] flex items-center justify-center p-4">
 <div id="export-box" class="modal-sheet w-full max-w-sm flex flex-col overflow-hidden" onclick="event.stopPropagation()">
 <div class="px-4 py-3.5 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
-<h3 class="text-sm font-semibold text-white">Export</h3>
+<h3 class="text-sm font-semibold text-white">Export Workspace</h3>
 <button onclick="UI.closeExportModal()" class="apple-btn w-6 h-6 text-zinc-400 hover:text-white rounded-full">
 <i data-lucide="x" class="w-4 h-4"></i>
 </button>
 </div>
-​<div class="p-4 flex flex-col gap-2">
+​<div class="p-4 flex flex-col gap-2.5">
 <button onclick="PrintEngine.printDocument(); UI.closeExportModal();" class="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-white/10 hover:border-purple-500/40 text-left transition">
 <div class="flex items-center gap-2.5">
 <i data-lucide="printer" class="w-4 h-4 text-purple-400"></i>
-<span class="text-xs font-medium text-white">Print / Save as PDF</span>
+<div>
+<span class="text-xs font-medium text-white block">Print / Save as PDF</span>
+<span class="text-[10px] text-zinc-400">AirPrint & Android native PDF engine</span>
+</div>
 </div>
 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
 </button>
 ​<button onclick="Workspace.exportStandaloneHTML()" class="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-white/10 hover:border-apple-blue/40 text-left transition">
 <div class="flex items-center gap-2.5">
 <i data-lucide="file-code-2" class="w-4 h-4 text-apple-blue"></i>
-<span class="text-xs font-medium text-white">Download Standalone HTML</span>
+<div>
+<span class="text-xs font-medium text-white block">Download Standalone HTML</span>
+<span class="text-[10px] text-zinc-400">Fully compiled (runs offline anywhere)</span>
+</div>
 </div>
 <i data-lucide="download" class="w-3.5 h-3.5 text-apple-blue"></i>
 </button>
 ​<button onclick="Workspace.copyCompiledHTML()" class="flex items-center justify-between p-3 rounded-xl bg-black/30 border border-white/10 hover:border-green-500/40 text-left transition">
 <div class="flex items-center gap-2.5">
 <i data-lucide="clipboard" class="w-4 h-4 text-green-400"></i>
-<span class="text-xs font-medium text-white">Copy Compiled HTML</span>
+<div>
+<span class="text-xs font-medium text-white block">Copy Compiled HTML</span>
+<span class="text-[10px] text-zinc-400">Directly paste code into any host</span>
+</div>
 </div>
 <i data-lucide="copy" class="w-3.5 h-3.5 text-green-400"></i>
 </button>
 </div>
 </div>
 </div>
-​<!-- DIALOG -->
+​<!-- DIALOG (PROMPT / CONFIRM / ALERT) -->
 <div id="dialog-overlay" class="hidden fixed inset-0 modal-backdrop z-[130] flex items-center justify-center p-4">
 <div id="dialog-box" class="modal-sheet w-full max-w-xs flex flex-col text-center overflow-hidden" onclick="event.stopPropagation()">
 <div class="p-4 flex flex-col items-center">
@@ -573,7 +643,7 @@ box-shadow: 0 0 12px #0A84FF;
 </div>
 </div>
 </div>
-​<!-- TOAST -->
+​<!-- TOAST NOTIFICATION -->
 <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[150] pointer-events-none w-full max-w-xs flex justify-center px-4">
 <div id="toast" class="panel px-3.5 py-1.5 rounded-full flex items-center gap-2 opacity-0 transition-all duration-300 transform translate-y-[-10px]">
 <i id="toast-icon" data-lucide="check" class="w-3.5 h-3.5 text-apple-blue"></i>
@@ -581,16 +651,69 @@ box-shadow: 0 0 12px #0A84FF;
 </div>
 </div>
 ​<script>
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+navigator.serviceWorker.register('./sw.js')
+.then(() => console.log('ServiceWorker registered'))
+.catch((err) => console.warn('ServiceWorker notice:', err));
+});
+}
+​// PWA Install Prompt Handler
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+e.preventDefault();
+deferredPrompt = e;
+const installBtn = document.getElementById('pwa-install-btn');
+if (installBtn) {
+installBtn.classList.remove('hidden');
+installBtn.onclick = () => {
+installBtn.classList.add('hidden');
+deferredPrompt.prompt();
+deferredPrompt.userChoice.then(() => {
+deferredPrompt = null;
+});
+};
+}
+});
+​// Workspace Templates
 const Templates = {
 empty: [
 { id: '1', name: 'index.html', language: 'html', content: '' }
 ],
-printpdf: [
+react: [
 {
 id: '1',
-name: 'index.html',
-language: 'html',
-content: `<!DOCTYPE html>
+name: 'App.jsx',
+language: 'javascript',
+content: `import React, { useState } from 'react';
+​export default function App() {
+const [count, setCount] = useState(0);
+​return (
+<div className="min-h-screen bg-[#08080c] text-white flex items-center justify-center p-4">
+<div className="w-full max-w-sm p-6 rounded-2xl bg-white/[0.04] border border-white/10 text-center">
+<h1 className="text-base font-semibold">React 18</h1>
+​<div className="text-4xl font-mono font-bold my-5 text-[#0A84FF]">
+{count}
+</div>
+​<div className="flex gap-2">
+<button
+onClick={() => setCount(c => c - 1)}
+className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 font-medium text-xs transition"
+>
+-
+</button>
+<button
+onClick={() => setCount(c => c + 1)}
+className="flex-1 py-2 rounded-xl bg-[#0A84FF] hover:bg-[#0071e3] active:scale-95 font-semibold text-xs text-white transition"
+>
++
+</button>
+</div>
+</div>
+</div>
+);
+} }, { id: '2', name: 'style.css', language: 'css', content:body {\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;\n  background: #08080c;\n}} ], vanilla: [ {  id: '1',  name: 'index.html',  language: 'html',  content:<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>App</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div class="card">\n    <h1>Hello World</h1>\n    <button onclick="document.getElementById('msg').innerText = 'Ready'">Click Me</button>\n    <div id="msg" style="margin-top: 15px; font-size: 13px; color: #0A84FF;"></div>\n  </div>\n</body>\n</html> }, {  id: '2',  name: 'style.css',  language: 'css',  content:body {\n  background: #08080c;\n  color: #FFFFFF;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, sans-serif;\n}\n.card {\n  padding: 2rem;\n  background: rgba(255, 255, 255, 0.04);\n  border-radius: 1rem;\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  text-align: center;\n  max-width: 320px;\n}\nbutton {\n  background: #0A84FF;\n  color: white;\n  border: none;\n  padding: 8px 18px;\n  border-radius: 99px;\n  font-size: 13px;\n  cursor: pointer;\n} } ], printpdf: [ { id: '1', name: 'index.html', language: 'html', content:<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -640,34 +763,7 @@ padding: 0 !important;
 @page {
 margin: 1.5cm;
 }
-}} ], react: [ {  id: '1',  name: 'App.jsx',  language: 'javascript',  content:import React, { useState } from 'react';
-​export default function App() {
-const [count, setCount] = useState(0);
-​return (
-<div className="min-h-screen bg-[#08080c] text-white flex items-center justify-center p-4">
-<div className="w-full max-w-sm p-6 rounded-2xl bg-white/[0.04] border border-white/10 text-center">
-<h1 className="text-base font-semibold">React 18</h1>
-​<div className="text-4xl font-mono font-bold my-5 text-[#0A84FF]">
-{count}
-</div>
-​<div className="flex gap-2">
-<button
-onClick={() => setCount(c => c - 1)}
-className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 active:scale-95 font-medium text-xs transition"
->
--
-</button>
-<button
-onClick={() => setCount(c => c + 1)}
-className="flex-1 py-2 rounded-xl bg-[#0A84FF] hover:bg-[#0071e3] active:scale-95 font-semibold text-xs text-white transition"
->
-+
-</button>
-</div>
-</div>
-</div>
-);
-} }, { id: '2', name: 'style.css', language: 'css', content:body {\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;\n  background: #08080c;\n}} ], vanilla: [ {  id: '1',  name: 'index.html',  language: 'html',  content:<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>App</title>\n</head>\n<body>\n  <div class="card">\n    <h1>Hello World</h1>\n    <button onclick="document.getElementById('msg').innerText = 'Ready'">Action</button>\n    <div id="msg" style="margin-top: 15px; font-size: 13px; color: #0A84FF;"></div>\n  </div>\n</body>\n</html> }, {  id: '2',  name: 'style.css',  language: 'css',  content:body {\n  background: #08080c;\n  color: #FFFFFF;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, sans-serif;\n}\n.card {\n  padding: 2rem;\n  background: rgba(255, 255, 255, 0.04);\n  border-radius: 1rem;\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  text-align: center;\n  max-width: 320px;\n}\nbutton {\n  background: #0A84FF;\n  color: white;\n  border: none;\n  padding: 8px 18px;\n  border-radius: 99px;\n  font-size: 13px;\n  cursor: pointer;\n}`
+}`
 }
 ]
 };
@@ -690,7 +786,6 @@ ideView: document.getElementById('ide-view'),
 fileList: document.getElementById('file-list'),
 tabs: document.getElementById('editor-tabs'),
 editor: document.getElementById('code-editor'),
-pre: document.getElementById('editor-pre'),
 lines: document.getElementById('line-numbers'),
 iframe: document.getElementById('preview-frame'),
 consoleOut: document.getElementById('console-output'),
@@ -698,40 +793,25 @@ loader: document.getElementById('loader'),
 sidebar: document.getElementById('sidebar'),
 vpContainer: document.getElementById('viewport-container')
 };
-​const Highlighter = {
-highlight: (code, lang) => {
-if (!code) return '';
-let html = code.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
-if (lang === 'html') {
-html = html.replace(/(</?)([a-zA-Z0-9-]+)(\s|>)/g, '$1<span class="syn-tag">$2</span>$3');
-html = html.replace(/([a-zA-Z-]+)=/g, '<span class="syn-attr">$1</span>=');
-html = html.replace(/(".?")/g, '<span class="syn-string">$1</span>');
-html = html.replace(/(<!--[\s\S]?-->)/g, '<span class="syn-comment">$1</span>');
-} else if (lang === 'css') {
-html = html.replace(/([a-zA-Z-]+)\s*:/g, '<span class="syn-property">$1</span>:');
-html = html.replace(/:(.?);/g, ':<span class="syn-string">$1</span>;');
-html = html.replace(/([.#@][a-zA-Z0-9_-]+)/g, '<span class="syn-tag">$1</span>');
-html = html.replace(//*[\s\S]?*//g, m => <span class="syn-comment">${m}</span>);
-} else if (lang === 'javascript' || lang === 'js' || lang === 'jsx' || lang === 'ts' || lang === 'tsx') {
-const keywords = /\b(const|let|var|function|return|if|else|for|while|class|import|export|default|from|new|true|false|null|undefined|async|await|try|catch|window|document|useState|useEffect|useRef|useCallback|useMemo|React|ReactDOM)\b/g;
-html = html.replace(keywords, '<span class="syn-keyword">$1</span>');
-html = html.replace(/(".?"|'.?'|.*?)/g, '<span class="syn-string">$1</span>');
-html = html.replace(/\b([0-9]+)\b/g, '<span class="syn-number">$1</span>');
-html = html.replace(/([a-zA-Z0-9_]+)\s*(/g, '<span class="syn-function">$1</span>(');
-html = html.replace(/(</?)([a-zA-Z0-9-]+)(.?>)/g, '$1<span class="syn-tag">$2</span>$3');
-html = html.replace(/(//.|/*[\s\S]*?*/)/g, m => <span class="syn-comment">${m}</span>);
-}
-return html;
-}
-};
 ​const PrintEngine = {
 printDocument: () => {
 UI.showToast("Opening Print...");
 ​try {
 const printDoc = Workspace.compileFullDocument();
-const printFrame = document.getElementById('native-print-frame');
-if (printFrame) {
-const frameDoc = printFrame.contentDocument || printFrame.contentWindow.document;
+let printFrame = document.getElementById('native-print-frame');
+if (!printFrame) {
+printFrame = document.createElement('iframe');
+printFrame.id = 'native-print-frame';
+printFrame.style.position = 'fixed';
+printFrame.style.right = '0';
+printFrame.style.bottom = '0';
+printFrame.style.width = '0px';
+printFrame.style.height = '0px';
+printFrame.style.border = 'none';
+printFrame.style.visibility = 'hidden';
+document.body.appendChild(printFrame);
+}
+​const frameDoc = printFrame.contentDocument || printFrame.contentWindow.document;
 frameDoc.open();
 frameDoc.write(printDoc);
 frameDoc.close();
@@ -744,9 +824,9 @@ PrintEngine.fallbackPrint(printDoc);
 }
 }, 250);
 return;
+} catch (err) {
+PrintEngine.fallbackPrint(Workspace.compileFullDocument());
 }
-} catch (err) {}
-​PrintEngine.fallbackPrint(Workspace.compileFullDocument());
 },
 ​fallbackPrint: (docContent) => {
 try {
@@ -763,7 +843,7 @@ printWindow.print();
 UI.showToast("Allow popups to print", true);
 }
 } catch (e) {
-UI.showToast("Print error", true);
+UI.showToast("Print notice: popups blocked", true);
 }
 }
 };
@@ -814,12 +894,15 @@ clean = clean.replace(/export\s+const\s+/g, 'const ');
 ​if (!clean.includes('ReactDOM.createRoot') && !clean.includes('ReactDOM.render')) {
 clean += \n\nif (typeof ReactDOM !== 'undefined' && document.getElementById('root')) {\n  const root = ReactDOM.createRoot(document.getElementById('root'));\n  root.render(React.createElement(App));\n};
 }
-​try {
+​if (typeof Babel !== 'undefined') {
+try {
 const result = Babel.transform(clean, { presets: ['react'] });
 return { code: result.code, error: null };
 } catch (err) {
 return { code: clean, error: err.message };
 }
+}
+​return { code: clean, error: null };
 }
 };
 ​const Preview = {
@@ -856,9 +939,9 @@ document.getElementById('preview-section').style.display = 'flex';
 const splash = document.getElementById('splash-screen');
 if (splash) {
 splash.style.opacity = '0';
-setTimeout(() => splash.remove(), 400);
+setTimeout(() => splash.remove(), 300);
 }
-}, 400);
+}, 350);
 },
 ​updatePillPosition: () => {
 const indicator = document.getElementById('segment-indicator');
@@ -889,7 +972,8 @@ btn.classList.remove('text-apple-blue');
 btn.classList.add('text-zinc-400');
 }
 });
-document.getElementById(mob-tab-${tab}).classList.replace('text-zinc-400', 'text-apple-blue');
+const activeBtn = document.getElementById(mob-tab-${tab});
+if (activeBtn) activeBtn.classList.replace('text-zinc-400', 'text-apple-blue');
 ​if (tab === 'editor') {
 es.style.display = 'flex';
 ps.style.display = 'none';
@@ -958,10 +1042,14 @@ Workspace.renderHomeGrid();
 Els.homeView.classList.replace('view-active', 'view-hidden');
 Els.ideView.classList.replace('view-hidden', 'view-active');
 Workspace.loadActive();
+if (window.innerWidth < 768) {
+UI.setMobileTab('editor');
+}
 }
 },
 ​showNewProjectModal: () => {
 document.getElementById('new-proj-name').value = '';
+document.getElementById('new-proj-template').value = 'empty';
 document.getElementById('new-project-overlay').classList.remove('hidden');
 document.getElementById('new-proj-name').focus();
 },
@@ -994,7 +1082,6 @@ Els.editor.addEventListener('input', (e) => {
 const f = State.files.find(x => x.id === State.activeFileId);
 if (f) {
 f.content = e.target.value;
-Els.pre.innerHTML = Highlighter.highlight(f.content, f.language);
 UI.updateLines();
 Workspace.save();
 if (State.autoRun) {
@@ -1008,8 +1095,6 @@ const syncScroll = () => {
 if (!isSyncingScroll) {
 window.requestAnimationFrame(() => {
 Els.lines.scrollTop = Els.editor.scrollTop;
-Els.pre.scrollTop = Els.editor.scrollTop;
-Els.pre.scrollLeft = Els.editor.scrollLeft;
 isSyncingScroll = false;
 });
 isSyncingScroll = true;
@@ -1119,7 +1204,7 @@ window.addEventListener('keydown', (e) => {
 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 e.preventDefault();
 Engine.run();
-UI.showToast("Saved");
+UI.showToast("Saved & Ran");
 }
 if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
 e.preventDefault();
@@ -1131,13 +1216,7 @@ PrintEngine.printDocument();
 UI.renderFiles();
 UI.renderTabs();
 const active = State.files.find(f => f.id === State.activeFileId);
-if (active) {
-Els.editor.value = active.content;
-Els.pre.innerHTML = Highlighter.highlight(active.content, active.language);
-} else {
-Els.editor.value = '';
-Els.pre.innerHTML = '';
-}
+Els.editor.value = active ? active.content : '';
 UI.updateLines();
 lucide.createIcons();
 },
@@ -1220,7 +1299,7 @@ UI.switchView('ide');
 ​renderHomeGrid: () => {
 const grid = document.getElementById('home-project-grid');
 const projs = Object.values(State.projects).sort((a,b) => b.updated - a.updated);
-​grid.innerHTML = projs.map(p => <div class="panel rounded-xl p-3.5 flex flex-col justify-between h-[120px] hover:border-white/20 transition cursor-pointer group" onclick="Workspace.openProj('${p.id}')"> <div class="flex items-start justify-between"> <div class="flex items-center gap-2.5"> <div class="w-8 h-8 rounded-lg bg-apple-blue/20 text-apple-blue flex items-center justify-center font-bold text-xs border border-apple-blue/30"> <i data-lucide="folder" class="w-4 h-4"></i> </div> <div> <h3 class="font-semibold text-white text-sm truncate max-w-[180px]">${p.name}</h3> <p class="text-[11px] text-zinc-500 mt-0.5">${p.files.length} file${p.files.length === 1 ? '' : 's'}</p> </div> </div> <button onclick="event.stopPropagation(); Workspace.deleteProj('${p.id}')" class="p-1 text-zinc-500 hover:text-red-400 transition rounded" title="Delete"> <i data-lucide="trash-2" class="w-4 h-4"></i> </button> </div> <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-2 border-t border-white/5"> <span>Ready</span> <span class="text-apple-blue font-medium flex items-center gap-0.5">Open <i data-lucide="chevron-right" class="w-3 h-3"></i></span> </div> </div>).join('');
+​grid.innerHTML = projs.map(p => <div class="panel rounded-xl p-3.5 flex flex-col justify-between h-[120px] hover:border-white/20 transition cursor-pointer group" onclick="Workspace.openProj('${p.id}')"> <div class="flex items-start justify-between"> <div class="flex items-center gap-2.5"> <div class="w-8 h-8 rounded-lg bg-apple-blue/20 text-apple-blue flex items-center justify-center font-bold text-xs border border-apple-blue/30"> <i data-lucide="folder" class="w-4 h-4"></i> </div> <div> <h3 class="font-semibold text-white text-sm truncate max-w-[180px]">${p.name}</h3> <p class="text-[11px] text-zinc-500 mt-0.5">${(p.files || []).length} file${(p.files || []).length === 1 ? '' : 's'}</p> </div> </div> <button onclick="event.stopPropagation(); Workspace.deleteProj('${p.id}')" class="p-1 text-zinc-500 hover:text-red-400 transition rounded" title="Delete"> <i data-lucide="trash-2" class="w-4 h-4"></i> </button> </div> <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-2 border-t border-white/5"> <span>Ready</span> <span class="text-apple-blue font-medium flex items-center gap-0.5">Open <i data-lucide="chevron-right" class="w-3 h-3"></i></span> </div> </div>).join('');
 lucide.createIcons();
 },
 ​createFile: async () => {
@@ -1268,6 +1347,9 @@ Workspace.renderHomeGrid();
 ​copyContent: () => {
 const f = State.files.find(x => x.id === State.activeFileId);
 if (!f) return;
+navigator.clipboard.writeText(f.content).then(() => {
+UI.showToast("Copied");
+}).catch(() => {
 const ta = document.createElement('textarea');
 ta.value = f.content;
 document.body.appendChild(ta);
@@ -1275,6 +1357,7 @@ ta.select();
 document.execCommand('copy');
 document.body.removeChild(ta);
 UI.showToast("Copied");
+});
 },
 ​compileFullDocument: () => {
 const htmlFile = State.files.find(f => f.name.endsWith('.html'));
@@ -1288,6 +1371,10 @@ let isReact = jsFiles.some(f => f.name.endsWith('.jsx') || f.content.includes('R
 if (isReact) {
 const res = ReactTransformer.transform(rawJs);
 compiledJs = res.code;
+}
+​// If user has a blank canvas, render a clean blank page without imposing boilerplate
+if (!html && !compiledJs && !cssContent) {
+return <!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;background:#08080c;color:#666;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;font-size:13px;}</style></head><body>Empty Workspace</body></html>;
 }
 ​if (!html) {
 html = <!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>App</title> <script src="https://cdn.tailwindcss.com"><\/script> ${isReact ? 
@@ -1306,8 +1393,10 @@ html = html.includes('<body>') ? html.replace('<body>', '<body>\n  <div id="root
 const styleTag = <style>\n${cssContent}\n</style>;
 html = html.includes('</head>') ? html.replace('</head>', ${styleTag}\n</head>) : styleTag + html;
 }
-​const scriptTag = <script>\n${compiledJs}\n<\/script>;
+​if (compiledJs) {
+const scriptTag = <script>\n${compiledJs}\n<\/script>;
 html = html.includes('</body>') ? html.replace('</body>', ${scriptTag}\n</body>) : html + '\n' + scriptTag;
+}
 }
 ​return html;
 },
@@ -1317,14 +1406,18 @@ const blob = new Blob([doc], { type: 'text/html' });
 const a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
 const p = State.projects[State.currentProjId];
-a.download = ${(p ? p.name : 'app').replace(/\s+/g, '-')}.html;
+a.download = ${(p ? p.name : 'workspace').replace(/\s+/g, '-')}.html;
 a.click();
 URL.revokeObjectURL(a.href);
 UI.closeExportModal();
-UI.showToast("Exported HTML");
+UI.showToast("Exported Standalone HTML");
 },
 ​copyCompiledHTML: () => {
 const doc = Workspace.compileFullDocument();
+navigator.clipboard.writeText(doc).then(() => {
+UI.closeExportModal();
+UI.showToast("Copied Compiled HTML");
+}).catch(() => {
 const ta = document.createElement('textarea');
 ta.value = doc;
 document.body.appendChild(ta);
@@ -1332,7 +1425,8 @@ ta.select();
 document.execCommand('copy');
 document.body.removeChild(ta);
 UI.closeExportModal();
-UI.showToast("Copied HTML");
+UI.showToast("Copied Compiled HTML");
+});
 },
 ​openNewTab: () => {
 if (State.blobUrl) window.open(State.blobUrl, '_blank');
@@ -1343,7 +1437,7 @@ run: () => {
 if (Els.loader) Els.loader.style.display = 'block';
 Engine.clearConsole();
 ​let doc = Workspace.compileFullDocument();
-​const interceptor = <script> window.onerror = function(msg, url, line) { window.parent.postMessage({ src: 'nova-console', type: 'error', msg: msg + ' (Line ' + line + ')' }, '*'); return false; }; const _log = console.log, _warn = console.warn, _error = console.error; console.log = function(...args) { window.parent.postMessage({ src: 'nova-console', type: 'log', msg: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') }, '*'); _log.apply(console, args); }; console.warn = function(...args) { window.parent.postMessage({ src: 'nova-console', type: 'warn', msg: args.join(' ') }, '*'); _warn.apply(console, args); }; console.error = function(...args) { window.parent.postMessage({ src: 'nova-console', type: 'error', msg: args.join(' ') }, '*'); _error.apply(console, args); }; <\/script>;
+​const interceptor = <script> window.onerror = function(msg, url, line) { window.parent.postMessage({ src: 'nova-console', type: 'error', msg: String(msg) + ' (Line ' + line + ')' }, '*'); return false; }; function safeStringify(item) { try { return typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item); } catch(e) { return String(item); } } const _log = console.log, _warn = console.warn, _error = console.error; console.log = function(...args) { window.parent.postMessage({ src: 'nova-console', type: 'log', msg: args.map(safeStringify).join(' ') }, '*'); _log.apply(console, args); }; console.warn = function(...args) { window.parent.postMessage({ src: 'nova-console', type: 'warn', msg: args.map(safeStringify).join(' ') }, '*'); _warn.apply(console, args); }; console.error = function(...args) { window.parent.postMessage({ src: 'nova-console', type: 'error', msg: args.map(safeStringify).join(' ') }, '*'); _error.apply(console, args); }; <\/script>;
 ​if (doc.includes('<head>')) {
 doc = doc.replace('<head>', <head>\n${interceptor});
 } else {
